@@ -1,0 +1,56 @@
+{
+  "_comment": "SCHKM 輿情監察設定。改呢個檔就可以加減關鍵詞/帳號/專頁，唔使改 code。",
+  "topic": "SCHKM 2027 一日/兩日、名額、賽制輿情",
+  "data_as_of_timezone": "Asia/Hong_Kong",
+
+  "threads_search": {
+    "keywords": ["渣馬", "渣打馬拉松", "渣打香港馬拉松", "香港馬拉松", "渣馬 名額", "渣馬 抽籤"],
+    "sort_orders": ["top", "recent"],
+    "max_posts_per_keyword": 100
+  },
+
+  "bank_noise_line": {
+    "_comment": "Gap 6 品牌污染線，獨立追蹤",
+    "keywords": ["渣打馬拉松 活期", "渣打馬拉松 息口", "渣打馬拉松 派息"],
+    "max_posts_per_keyword": 40
+  },
+
+  "watchlist_threads": [
+    "fitz.hk", "sportsroad.hk", "bijihk", "kong.news", "am730hk", "takungpao",
+    "lionrockdaily", "inmediahknet", "hkeverydayrunners", "schkmarathon",
+    "martin3388", "kk30gsw", "ericchan326", "moses_bob_wong", "steveyu.rdcoach",
+    "cheerfulsuen", "tszyiu1999", "wannarun__ro"
+  ],
+
+  "watchlist_instagram": [
+    "sportsroad.hk", "schkmarathon", "the_collectivehk", "bijihk", "walkwithtsui", "hkwellnessmap"
+  ],
+  "instagram_hashtags": ["渣馬", "渣打香港馬拉松", "渣馬2027", "schkm"],
+
+  "facebook_pages": [
+    "hkmarathon", "ilovehkaaa", "fitz.hk", "stheadlinehk", "DiscussHK", "bijihk"
+  ],
+
+  "forum_discovery": {
+    "_comment": "反爬平台：只做發現，內容人手開",
+    "site_searches": ["site:lihkg.com 渣馬", "site:discuss.com.hk 渣打馬拉松", "site:threads.com 渣馬 分兩日"]
+  },
+
+  "noise_filters": {
+    "_comment": "命中呢啲詞而又冇跑步訊號，剔往噪音線",
+    "bank_terms": ["活期", "存款", "利率", "息口", "利息", "信用卡", "里數", "扣費", "櫃員機", "戶口", "轉數快", "定期", "盲盒", "rebate", "派息", "分行", "smart card"],
+    "offtopic_terms": ["馬的", "河馬", "跳跳馬", "騎馬", "故宮", "法鬥"],
+    "running_signal_terms": ["跑", "報名", "抽籤", "中籤", "全馬", "半馬", "10k", "10K", "名額", "賽道", "封路", "配速", "pb", "PB", "跑手", "兩日", "兩天"]
+  },
+
+  "issue_taxonomy": {
+    "_comment": "對應 deck 嘅 issue row + 6 gap；分類層打標籤，量突升即預警",
+    "labels": [
+      "two-day-format", "quota-general", "charity-quota", "guaranteed-quota",
+      "dual-identity", "insider-channel", "resale-blackmarket", "road-closure",
+      "north-metropolis", "route-change", "medical-safety", "fees",
+      "platinum-label-comparison", "mega-event-economy", "ballot-odds",
+      "runner-pack-expo", "weather", "banned-shoes", "bank-noise", "other"
+    ]
+  }
+}

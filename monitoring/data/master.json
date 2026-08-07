@@ -1,0 +1,529 @@
+{
+ "items": {
+  "https://lihkg.com/thread/4056286/page/2": {
+   "author": null,
+   "date": "2026-01",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "two-day-format",
+    "north-metropolis"
+   ],
+   "origin": "deck-annex",
+   "platform": "lihkg",
+   "relevance": "direct",
+   "replies": 29,
+   "review_status": "approved",
+   "source_channel": "seed:deck-annex",
+   "text": "霍啟剛倡：渣打馬拉松分兩日舉行 有助宣傳北都",
+   "url": "https://lihkg.com/thread/4056286/page/2"
+  },
+  "https://lihkg.com/thread/4063805/page/1": {
+   "author": null,
+   "date": "2026-01",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "two-day-format"
+   ],
+   "origin": "deck-annex",
+   "platform": "lihkg",
+   "relevance": "direct",
+   "replies": 23,
+   "review_status": "approved",
+   "source_channel": "seed:deck-annex",
+   "text": "【渣打馬拉松】議員倡分兩日舉行 一日專業賽事一日與眾同樂",
+   "url": "https://lihkg.com/thread/4063805/page/1"
+  },
+  "https://www.discuss.com.hk/redirect.php": {
+   "author": null,
+   "date": "2026-04",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "two-day-format",
+    "road-closure"
+   ],
+   "origin": "deck-annex",
+   "platform": "hkdiscuss",
+   "relevance": "direct",
+   "replies": 42,
+   "review_status": "approved",
+   "source_channel": "seed:deck-annex",
+   "text": "大棋盤︱渣馬研分兩日舉行 封路安排費思量",
+   "url": "https://www.discuss.com.hk/redirect.php"
+  },
+  "https://www.facebook.com/100063811579149/posts/1388317133305326": {
+   "author": "sportsroad",
+   "date": "2026-01-16",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "two-day-format"
+   ],
+   "origin": "claude-verified",
+   "platform": "facebook",
+   "relevance": "direct",
+   "replies": 9,
+   "review_status": "approved",
+   "source_channel": "seed:claude-verified",
+   "text": "體路FB：如果分開兩日搞，相信可以畀更多跑手報到名",
+   "url": "https://www.facebook.com/100063811579149/posts/1388317133305326"
+  },
+  "https://www.facebook.com/hkmarathon/posts/1827627874537502": {
+   "author": "hkmarathon",
+   "date": "2025-10-02",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "quota-general"
+   ],
+   "origin": "claude-verified",
+   "platform": "facebook",
+   "relevance": "direct",
+   "replies": 8,
+   "review_status": "approved",
+   "source_channel": "seed:claude-verified",
+   "text": "渣馬2026第二輪公眾抽籤結果（留言區大量抽唔中怨氣）",
+   "url": "https://www.facebook.com/hkmarathon/posts/1827627874537502"
+  },
+  "https://www.facebook.com/hkmarathon/posts/1829264571040499": {
+   "author": "hkmarathon",
+   "date": "2025-10-04",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "other"
+   ],
+   "origin": "claude-verified",
+   "platform": "facebook",
+   "relevance": "background",
+   "replies": 4,
+   "review_status": "approved",
+   "source_channel": "seed:claude-verified",
+   "text": "報名近12萬公布帖",
+   "url": "https://www.facebook.com/hkmarathon/posts/1829264571040499"
+  },
+  "https://www.facebook.com/photo": {
+   "author": "DiscussHK",
+   "date": "2026-04-15",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "two-day-format"
+   ],
+   "origin": "deck-annex",
+   "platform": "facebook",
+   "relevance": "direct",
+   "replies": 15,
+   "review_status": "approved",
+   "source_channel": "seed:deck-annex",
+   "text": "渣馬考慮分兩日跑！跑手反應兩極",
+   "url": "https://www.facebook.com/photo"
+  },
+  "https://www.facebook.com/share/p/1EJQtS3aXn": {
+   "author": "fitz.hk",
+   "date": "2026-01-19",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "two-day-format",
+    "north-metropolis"
+   ],
+   "origin": "deck-annex",
+   "platform": "facebook",
+   "relevance": "direct",
+   "replies": 150,
+   "review_status": "approved",
+   "source_channel": "seed:deck-annex",
+   "text": "渣馬分兩日搞? | 霍啟剛倡一日市區一日北都（FB版）",
+   "url": "https://www.facebook.com/share/p/1EJQtS3aXn"
+  },
+  "https://www.facebook.com/stheadlinehk/posts/1386223580211620": {
+   "author": "stheadlinehk",
+   "date": "2026-04-14",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "two-day-format",
+    "mega-event-economy"
+   ],
+   "origin": "claude-verified",
+   "platform": "facebook",
+   "relevance": "direct",
+   "replies": 9,
+   "review_status": "approved",
+   "source_channel": "seed:claude-verified",
+   "text": "星島：分兩日搞，順手帶動埋旅遊業喎（留言區反對為主）",
+   "url": "https://www.facebook.com/stheadlinehk/posts/1386223580211620"
+  },
+  "https://www.instagram.com/p/DO70qXnk555": {
+   "author": "schkmarathon",
+   "date": "2025-09-22",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "quota-general"
+   ],
+   "origin": "claude-verified",
+   "platform": "instagram",
+   "relevance": "direct",
+   "replies": 8,
+   "review_status": "approved",
+   "source_channel": "seed:claude-verified",
+   "text": "渣馬2026第一輪抽籤結果（IG）",
+   "url": "https://www.instagram.com/p/DO70qXnk555"
+  },
+  "https://www.instagram.com/p/DTh19M_D5LE": {
+   "author": "walkwithtsui",
+   "date": "2026-01-15",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "ballot-odds"
+   ],
+   "origin": "claude-verified",
+   "platform": "instagram",
+   "relevance": "direct",
+   "replies": 0,
+   "review_status": "approved",
+   "source_channel": "seed:claude-verified",
+   "text": "渣馬2026史上最難抽！120,000人爭74,000位",
+   "url": "https://www.instagram.com/p/DTh19M_D5LE"
+  },
+  "https://www.instagram.com/p/DTkSKqPgcpc": {
+   "author": "sportsroad.hk",
+   "date": "2026-01-16",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "two-day-format"
+   ],
+   "origin": "deck-annex",
+   "platform": "instagram",
+   "relevance": "direct",
+   "replies": 72,
+   "review_status": "approved",
+   "source_channel": "seed:deck-annex",
+   "text": "渣馬｜報名人數再創新高 田總稱考慮未來分兩日舉辦",
+   "url": "https://www.instagram.com/p/DTkSKqPgcpc"
+  },
+  "https://www.instagram.com/p/DUXJsL1DNl8": {
+   "author": "inmediahk",
+   "date": "2026-01",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "two-day-format"
+   ],
+   "origin": "deck-annex",
+   "platform": "instagram",
+   "relevance": "direct",
+   "replies": 172,
+   "review_status": "approved",
+   "source_channel": "seed:deck-annex",
+   "text": "議員倡分兩日舉行 一日專業賽事一日與眾同樂",
+   "url": "https://www.instagram.com/p/DUXJsL1DNl8"
+  },
+  "https://www.threads.com/@cheerfulsuen/post/DT9F3ZMkorq": {
+   "author": "cheerfulsuen",
+   "date": "2026-01-26",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "other"
+   ],
+   "origin": "claude-verified",
+   "platform": "threads",
+   "relevance": "background",
+   "replies": 0,
+   "review_status": "approved",
+   "source_channel": "seed:claude-verified",
+   "text": "渣馬10K限時2小時，最困難應該係塞人，唔係完成",
+   "url": "https://www.threads.com/@cheerfulsuen/post/DT9F3ZMkorq"
+  },
+  "https://www.threads.com/@ericchan326/post/DOjvx9dkoi9": {
+   "author": "ericchan326",
+   "date": "2025-09-13",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "route-change"
+   ],
+   "origin": "claude-verified",
+   "platform": "threads",
+   "relevance": "adjacent",
+   "replies": 0,
+   "review_status": "approved",
+   "source_channel": "seed:claude-verified",
+   "text": "啱啱先留意到原來中九龍幹線嘅上落幅度恐怖過西隧好多",
+   "url": "https://www.threads.com/@ericchan326/post/DOjvx9dkoi9"
+  },
+  "https://www.threads.com/@ericchan326/post/DPXiGLhkkyd": {
+   "author": "ericchan326",
+   "date": "2025-10-04",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "two-day-format"
+   ],
+   "origin": "deck-annex",
+   "platform": "threads",
+   "relevance": "direct",
+   "replies": 35,
+   "review_status": "approved",
+   "source_channel": "seed:deck-annex",
+   "text": "其實渣馬會唔會學吓其他地方，考慮將breakfast run同真正馬拉松分開兩日搞",
+   "url": "https://www.threads.com/@ericchan326/post/DPXiGLhkkyd"
+  },
+  "https://www.threads.com/@fitz.hk/post/DTrQQPIjz9D": {
+   "author": "fitz.hk",
+   "date": "2026-01-19",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "two-day-format",
+    "north-metropolis",
+    "route-change"
+   ],
+   "origin": "deck-annex",
+   "platform": "threads",
+   "relevance": "direct",
+   "replies": 43,
+   "review_status": "approved",
+   "source_channel": "seed:deck-annex",
+   "text": "渣馬分兩日搞? | 霍啟剛倡一日市區一日北都 田總: 成立特別小組研究新路線",
+   "url": "https://www.threads.com/@fitz.hk/post/DTrQQPIjz9D"
+  },
+  "https://www.threads.com/@fitz.hk/post/DXa2X7nACBR": {
+   "author": "fitz.hk",
+   "date": "2026-04-22",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "mega-event-economy"
+   ],
+   "origin": "claude-verified",
+   "platform": "threads",
+   "relevance": "adjacent",
+   "replies": 0,
+   "review_status": "approved",
+   "source_channel": "seed:claude-verified",
+   "text": "田總委託理大賽後問卷：逾10,000跑手、85%滿意、經濟效益3.38億",
+   "url": "https://www.threads.com/@fitz.hk/post/DXa2X7nACBR"
+  },
+  "https://www.threads.com/@harbourdailyuk/post/DZzfjVwjA8S": {
+   "author": "harbourdailyuk",
+   "date": "2026-06-20",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "two-day-format",
+    "platinum-label-comparison"
+   ],
+   "origin": "claude-verified",
+   "platform": "threads",
+   "relevance": "direct",
+   "replies": 1,
+   "review_status": "approved",
+   "source_channel": "seed:claude-verified",
+   "text": "倫敦馬拉松擴規模 史上首次連跑兩日",
+   "url": "https://www.threads.com/@harbourdailyuk/post/DZzfjVwjA8S"
+  },
+  "https://www.threads.com/@hkeverydayrunners/post/Da1UIwpE9WV": {
+   "author": "hkeverydayrunners",
+   "date": "2026-07-16",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "two-day-format",
+    "quota-general",
+    "ballot-odds",
+    "platinum-label-comparison"
+   ],
+   "origin": "claude-verified",
+   "platform": "threads",
+   "relevance": "direct",
+   "replies": 2,
+   "review_status": "approved",
+   "source_channel": "seed:claude-verified",
+   "text": "倫敦馬兩日賽制中籤率仍極低，不如轉戰愛丁堡",
+   "url": "https://www.threads.com/@hkeverydayrunners/post/Da1UIwpE9WV"
+  },
+  "https://www.threads.com/@isme_kkkkk/post/DbBOSBLk7Yf": {
+   "author": "isme_kkkkk",
+   "date": "2026-07-20",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "other"
+   ],
+   "origin": "claude-verified",
+   "platform": "threads",
+   "relevance": "background",
+   "replies": 12,
+   "review_status": "approved",
+   "source_channel": "seed:claude-verified",
+   "text": "我想報10k渣馬",
+   "url": "https://www.threads.com/@isme_kkkkk/post/DbBOSBLk7Yf"
+  },
+  "https://www.threads.com/@kk30gsw/post/DTsVTMIEkiG": {
+   "author": "kk30gsw",
+   "date": "2026-01-19",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "two-day-format"
+   ],
+   "origin": "deck-annex",
+   "platform": "threads",
+   "relevance": "direct",
+   "replies": 37,
+   "review_status": "approved",
+   "source_channel": "seed:deck-annex",
+   "text": "有人提出渣馬分兩日舉行，我分析一下：最合理係星期六跑10k，星期日跑半馬+全馬",
+   "url": "https://www.threads.com/@kk30gsw/post/DTsVTMIEkiG"
+  },
+  "https://www.threads.com/@kong.news/post/DTpm9SOEr3v": {
+   "author": "kong.news",
+   "date": "2026-01-18",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "medical-safety"
+   ],
+   "origin": "claude-verified",
+   "platform": "threads",
+   "relevance": "adjacent",
+   "replies": 1,
+   "review_status": "approved",
+   "source_channel": "seed:claude-verified",
+   "text": "渣馬2026：1,517人需治理、59送院、2危殆",
+   "url": "https://www.threads.com/@kong.news/post/DTpm9SOEr3v"
+  },
+  "https://www.threads.com/@lan.shua/post/DbubzFaE_4Y": {
+   "author": "lan.shua",
+   "date": "2026-08-07",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "other"
+   ],
+   "origin": "claude-verified",
+   "platform": "threads",
+   "relevance": "background",
+   "replies": 8,
+   "review_status": "approved",
+   "source_channel": "seed:claude-verified",
+   "text": "為查渣馬2027報名日期發現Abbott分齡世界排名",
+   "url": "https://www.threads.com/@lan.shua/post/DbubzFaE_4Y"
+  },
+  "https://www.threads.com/@martin3388/post/DPZIbptD4Ht": {
+   "author": "martin3388",
+   "date": "2025-10-04",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "charity-quota"
+   ],
+   "origin": "claude-verified",
+   "platform": "threads",
+   "relevance": "direct",
+   "replies": 1,
+   "review_status": "approved",
+   "source_channel": "seed:claude-verified",
+   "text": "下年第八度挑戰香港渣馬最終失敗! 雖然有問過慈善位,但係價錢非常瘋狂",
+   "url": "https://www.threads.com/@martin3388/post/DPZIbptD4Ht"
+  },
+  "https://www.threads.com/@martin3388/post/DTnCeWZD-56": {
+   "author": "martin3388",
+   "date": "2026-01-17",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "charity-quota",
+    "insider-channel",
+    "quota-general"
+   ],
+   "origin": "claude-verified",
+   "platform": "threads",
+   "relevance": "direct",
+   "replies": 0,
+   "review_status": "approved",
+   "source_channel": "seed:claude-verified",
+   "text": "屬會報名有問題報唔到，公眾抽籤兩輪都唔中，再望慈善位既癲價都已經放棄。十月…有背後有勢力人士通知我有方法可以去跑",
+   "url": "https://www.threads.com/@martin3388/post/DTnCeWZD-56"
+  },
+  "https://www.threads.com/@martin3388/post/DTs9Cu5k93b": {
+   "author": "martin3388",
+   "date": "2026-01-19",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "route-change"
+   ],
+   "origin": "deck-annex",
+   "platform": "threads",
+   "relevance": "adjacent",
+   "replies": 20,
+   "review_status": "approved",
+   "source_channel": "seed:deck-annex",
+   "text": "香港渣馬其實係現有賽道下，最大問題係半馬要就全馬加唔到位，所以半馬同全馬要分開星期六日搞",
+   "url": "https://www.threads.com/@martin3388/post/DTs9Cu5k93b"
+  },
+  "https://www.threads.com/@steveyu.rdcoach/post/DbnuvzIAfpE": {
+   "author": "steveyu.rdcoach",
+   "date": "2026-08-04",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "guaranteed-quota"
+   ],
+   "origin": "claude-verified",
+   "platform": "threads",
+   "relevance": "direct",
+   "replies": 10,
+   "review_status": "approved",
+   "source_channel": "seed:claude-verified",
+   "text": "半日就FULL左，夠出席率有保證渣馬購買額 報名成功",
+   "url": "https://www.threads.com/@steveyu.rdcoach/post/DbnuvzIAfpE"
+  },
+  "https://www.threads.com/@sunnychan1987/post/DTxnQkgiCTn": {
+   "author": "sunnychan1987",
+   "date": "2026-01-21",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "two-day-format"
+   ],
+   "origin": "deck-annex",
+   "platform": "threads",
+   "relevance": "direct",
+   "replies": 0,
+   "review_status": "approved",
+   "source_channel": "seed:deck-annex",
+   "text": "而家討論緊香港渣馬分唔分兩日搞 其實瑞士同澳洲都做緊 日內瓦同黃金海岸馬拉松星期六傍晚跑小型嘅",
+   "url": "https://www.threads.com/@sunnychan1987/post/DTxnQkgiCTn"
+  },
+  "https://www.threads.com/@thisissyss/post/DbqW6rIDx25": {
+   "author": "thisissyss",
+   "date": "2026-08-05",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "other"
+   ],
+   "origin": "claude-verified",
+   "platform": "threads",
+   "relevance": "background",
+   "replies": 9,
+   "review_status": "approved",
+   "source_channel": "seed:claude-verified",
+   "text": "希望抽到2027渣打馬拉松全馬",
+   "url": "https://www.threads.com/@thisissyss/post/DbqW6rIDx25"
+  },
+  "https://www.threads.com/@tszyiu1999/post/DbilPNOkwoo": {
+   "author": "tszyiu1999",
+   "date": "2026-08-02",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "other"
+   ],
+   "origin": "claude-verified",
+   "platform": "threads",
+   "relevance": "background",
+   "replies": 0,
+   "review_status": "approved",
+   "source_channel": "seed:claude-verified",
+   "text": "大目標：2027年渣馬 sub 3 訓練日記#421",
+   "url": "https://www.threads.com/@tszyiu1999/post/DbilPNOkwoo"
+  },
+  "https://www.threads.com/@wannarun__ro/post/Da4Jx5Xj6QV": {
+   "author": "wannarun__ro",
+   "date": "2026-07-17",
+   "first_seen": "2026-08-08",
+   "issue_labels": [
+    "other"
+   ],
+   "origin": "claude-verified",
+   "platform": "threads",
+   "relevance": "background",
+   "replies": 17,
+   "review_status": "approved",
+   "source_channel": "seed:claude-verified",
+   "text": "26-27跑步比賽行程：27 1.17 渣打馬拉松(半/全)",
+   "url": "https://www.threads.com/@wannarun__ro/post/Da4Jx5Xj6QV"
+  }
+ },
+ "runs": []
+}

@@ -1,0 +1,14 @@
+# API keys — 絕對唔好 commit
+monitoring/.env
+**/.tikhub_key
+**/.apify_key
+*.key
+
+# 依賴
+node_modules/
+__pycache__/
+*.pyc
+
+# 生成物（保留 out/ 目錄但唔追蹤 pptx）
+monitoring/out/*.pptx
+monitoring/out/_build_annex.js
