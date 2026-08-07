@@ -42,26 +42,47 @@ def _token(env_name, label):
 class TikHub:
     """Threads + Instagram 抽取。端點間歇性 flaky，全部有 retry。"""
 
-    def __init__(self):
+    # 端點間歇性 400，但重試太狠會令整個 watchlist 階段跑幾個鐘。
+    # 用「單次呼叫短 timeout + 少重試 + 全域時間預算」三重限制。
+    CALL_TIMEOUT = 25
+    DEFAULT_TRIES = 2
+
+    def __init__(self, budget_seconds=None):
         self.token = _token("TIKHUB_API_KEY", "TikHub")
         self.calls = 0
+        self.failures = 0
+        self._budget = budget_seconds
+        self._start = time.time()
 
-    def get(self, path, tries=4, **params):
+    def budget_exhausted(self):
+        return self._budget is not None and (time.time() - self._start) > self._budget
+
+    def get(self, path, tries=None, **params):
+        tries = tries or self.DEFAULT_TRIES
         url = f"{TIKHUB_BASE}/{path}?" + urllib.parse.urlencode(params)
         last = None
         for i in range(tries):
+            if self.budget_exhausted():
+                raise ApiError(f"TikHub 時間預算用完，跳過 {path}")
             self.calls += 1
             try:
-                out = _curl(url, {"Authorization": f"Bearer {self.token}"})
+                out = _curl(
+                    url,
+                    {"Authorization": f"Bearer {self.token}"},
+                    timeout=self.CALL_TIMEOUT,
+                )
                 d = json.loads(out)
             except Exception as e:  # noqa: BLE001
-                last = str(e)
-                time.sleep(1.2 * (i + 1))
+                last = str(e)[:120]
+                if i < tries - 1:
+                    time.sleep(1.0)
                 continue
             if "detail" not in d:
                 return d
             last = (d.get("detail") or {}).get("message", "")[:120]
-            time.sleep(1.2 * (i + 1))
+            if i < tries - 1:
+                time.sleep(1.0)
+        self.failures += 1
         raise ApiError(f"TikHub {path} failed after {tries} tries: {last}")
 
     def try_get(self, path, **params):

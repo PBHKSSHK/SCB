@@ -71,12 +71,28 @@ def discover_threads_search(apify, cfg, light, log):
     return out
 
 
-def discover_threads_watchlist(tik, cfg, learned, log):
-    """逐個 watchlist 帳號拉最新帖 —— 補搜尋窗口盲點。"""
+def discover_threads_watchlist(tik, cfg, learned, log, budget_s=420):
+    """逐個 watchlist 帳號拉最新帖 —— 補搜尋窗口盲點。
+
+    TikHub 端點間歇性失敗，所以設全階段時間預算：跑到時限就停，
+    並喺報告出警報（覆蓋唔完整好過整個 sweep 掛住幾個鐘）。
+    """
+    import time as _t
+
     out = []
     names = list(dict.fromkeys(cfg["watchlist_threads"] + learned.get("threads", [])))
     ok = fail = 0
-    for name in names:
+    t0 = _t.time()
+    skipped = []
+    for idx, name in enumerate(names):
+        if _t.time() - t0 > budget_s:
+            skipped = names[idx:]
+            log(
+                f"  !! watchlist 時間預算 {budget_s}s 用完，跳過剩餘 {len(skipped)} 個帳號："
+                f"{', '.join(skipped[:8])}{'...' if len(skipped) > 8 else ''}",
+                warn=True,
+            )
+            break
         ui = tik.threads_user_info(name)
         pk = ((ui or {}).get("data") or {}).get("user", {}).get("pk") if ui else None
         if not pk:
@@ -108,9 +124,13 @@ def discover_threads_watchlist(tik, cfg, learned, log):
                 )
                 n += 1
         ok += 1
-    log(f"  Threads watchlist: {ok} 個帳號成功 / {fail} 失敗，收 {len(out)} 條帖")
+    elapsed = int(_t.time() - t0)
+    log(
+        f"  Threads watchlist: {ok} 成功 / {fail} 失敗 / {len(skipped)} 跳過"
+        f"，收 {len(out)} 條帖（{elapsed}s）"
+    )
     if fail > ok:
-        log(f"  !! 過半帳號抽取失敗（TikHub flaky）—— 本次覆蓋可能唔完整", warn=True)
+        log("  !! 過半帳號抽取失敗（TikHub flaky）—— 本次覆蓋可能唔完整", warn=True)
     return out
 
 
