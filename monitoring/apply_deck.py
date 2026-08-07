@@ -143,8 +143,16 @@ def main():
             }
         )
 
+    # 組別次序：Direct 最重要行先，Background 殿後
+    ORDER = [
+        "Direct 2-day / quota discussion",
+        "Adjacent (route / medical / fees / economy)",
+        "Background & noise samples",
+    ]
+    ordered = {g: groups[g] for g in ORDER if g in groups}
+
     os.makedirs(OUT, exist_ok=True)
-    js = build_js(dict(groups), store.today_str(), 0 if args.include_pending else len(pending))
+    js = build_js(ordered, store.today_str(), 0 if args.include_pending else len(pending))
     jsp = os.path.join(OUT, "_build_annex.js")
     with open(jsp, "w", encoding="utf-8") as f:
         f.write(js)

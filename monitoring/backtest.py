@@ -64,6 +64,18 @@ MUST_DROP = [
      "機管局債券今日到期 連本帶利收回$30,000 即刻將新資金轉去渣打馬拉松活期存款 繼續跑賺高息"),
     ("虛銀比較（含渣馬字眼）", "做 Mox Flexiboost 都好過今個月渣馬"),
     ("台灣新手提問", "今天一樣來跑步 跑到第3k就想放棄了 這樣真的可以去報名10k馬拉松嗎"),
+    ("比喻用法（教育馬拉松）",
+     "呈分試改革…校長提醒：教育係馬拉松，健康體魄同均衡發展，先至係走得遠嘅關鍵"),
+    ("港人跑海外賽（零渣馬內容）",
+     "我嘅第四隻馬拉松 2026年12月6日再戰華倫西亞馬拉松 初馬2025年2月大阪馬"),
+]
+
+# --- C. 必須保留但降級為 background（其他香港賽事，屬本地跑步生態背景）---
+MUST_DEMOTE = [
+    ("Garmin Run 香港站",
+     "2026 Garmin Run 馬拉松系列賽-香港站 12月20號沙田運動場 賽事組別21公里,10公里及3公里"),
+    ("香港街馬",
+     "街馬個定位真係越嚟越模糊，fun又唔夠fun，認真跑又冇意思"),
 ]
 
 
@@ -93,6 +105,15 @@ def main():
         print(f"  {'✅' if noise else '❌'} {name}")
         if not noise:
             fails.append(f"漏網: {name}")
+
+    print("\n[必須保留但降級 background（其他香港賽事）]")
+    for name, txt in MUST_DEMOTE:
+        noise = classify.is_noise(txt, cfg)
+        rel = classify.relevance(txt)
+        ok = (not noise) and rel == "background"
+        print(f"  {'✅' if ok else '❌'} {name}  (noise={noise}, relevance={rel})")
+        if not ok:
+            fails.append(f"降級失敗: {name}")
 
     print("\n" + "=" * 66)
     print("B. Deck annex 覆蓋度")

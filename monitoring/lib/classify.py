@@ -89,6 +89,35 @@ RACE_PARTICIPATION = (
 )
 
 
+# 「馬拉松」作為比喻 —— 教育/人生/工作馬拉松，唔關賽事事
+METAPHOR = (
+    r"(教育|人生|工作|職場|創業|讀書|補習|考試|呈分試|減肥|育兒|投資|追劇|開會)"
+    r"[^。！？]{0,12}馬拉松"
+)
+
+# 其他香港賽事 —— 保留（本地跑步生態背景）但降級為 background
+OTHER_HK_RACE = (
+    r"Garmin Run|街馬|香港街馬|毅行者|Pegasus|天水圍.{0,4}錦標|新鴻基.{0,6}錦標"
+    r"|UTMB|越野|trail|北都馬拉松|港珠澳.{0,4}半馬|大尾篤"
+)
+
+
+def is_metaphor(text):
+    t = text or ""
+    if not re.search(METAPHOR, t):
+        return False
+    # 有實際賽事語言就唔算比喻
+    return not re.search(RACE_DOMAIN, t, re.I)
+
+
+def is_other_hk_race(text):
+    """香港其他賽事：保留做背景，但唔應該混入渣馬 direct/adjacent 組。"""
+    t = text or ""
+    if re.search(SCHKM_STRONG, t):
+        return False
+    return bool(re.search(OTHER_HK_RACE, t, re.I))
+
+
 def is_noise(text, cfg, is_comment=False):
     """True = 應剔往噪音線。
 
@@ -111,9 +140,11 @@ def is_noise(text, cfg, is_comment=False):
     if finance and not participation:
         return True
 
-    # 2. 離題詞
+    # 2. 離題詞 + 比喻用法
     off = any(w in t for w in nf.get("offtopic_terms", []))
     if off and not participation:
+        return True
+    if is_metaphor(t):
         return True
 
     if is_comment:
@@ -131,11 +162,13 @@ def is_noise(text, cfg, is_comment=False):
         return False
 
     # 4. 其餘一律要求香港語境 + 賽事語言
+    #    （其他香港賽事名本身就係賽事訊號，例：「街馬」冇「馬拉松」三個字）
+    hk_race = bool(re.search(OTHER_HK_RACE, t, re.I))
     if not hk:
         return True
-    if other_region and not domain:
+    if other_region and not (domain or hk_race):
         return True
-    return not (domain or generic)
+    return not (domain or generic or hk_race)
 
 
 def is_bank_line(text):
@@ -160,6 +193,10 @@ def speaker_type(text):
 
 
 def relevance(text):
+    # 其他香港賽事：保留做本地跑步生態背景，唔混入渣馬議題組
+    if is_other_hk_race(text):
+        return "background"
+
     labs = label_text(text)
     direct = {
         "two-day-format",
@@ -170,8 +207,10 @@ def relevance(text):
         "ballot-odds",
         "charity-quota",
     }
+    strong = bool(re.search(SCHKM_STRONG, text or ""))
     if set(labs) & direct:
-        return "direct"
+        # 議題詞命中，但如果連渣馬字眼都冇，只算 adjacent
+        return "direct" if strong else "adjacent"
     if labs != ["other"]:
-        return "adjacent"
+        return "adjacent" if strong else "background"
     return "background"
