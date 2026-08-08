@@ -47,6 +47,8 @@ monitoring/
 ├── data/
 │   ├── master.json       ← 唯一真相來源（git 追蹤，有版本史）
 │   ├── watchlist_learned.json  ← 雪球學到嘅帳號
+│   ├── phase0_twoday_corpus.json      ← 「一日vs兩日」帖＋全部留言（Phase 0 語料）
+│   ├── twoday_community_read.json     ← 371 條留言嘅分類 labels（真跑手/抽水/立場/論點）
 │   └── raw/<run_id>/     ← 原始 API 回應（審計用）
 ├── reports/run_*.md      ← 每次掃描嘅 diff 報告
 └── out/                  ← 生成嘅 pptx

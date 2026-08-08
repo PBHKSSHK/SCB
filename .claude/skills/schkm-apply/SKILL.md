@@ -25,9 +25,23 @@ python3 monitoring/apply_deck.py --approve-all
 
 # 連未核對都出，會喺 deck 標紅
 python3 monitoring/apply_deck.py --include-pending
+
+# 唔出 community-read 分析頁（或用 --analysis <path> 指定另一份 labels）
+python3 monitoring/apply_deck.py --no-analysis
 ```
 
 輸出：`monitoring/out/SCHKM_Annex_auto.pptx`
+
+## Community-read 分析頁
+
+如果 `monitoring/data/twoday_community_read.json`（comment-level 分類 labels）存在，
+deck 會自動喺 title 之後加 3 頁分析：
+
+1. **Cohort × stance 表** —— 全體 / 確認跑手（R1+R2）/ 唔跑抽水（S）/ 判唔到（U）各自嘅立場分佈 + key takeaways
+2. **真跑手論點矩陣** —— support vs oppose 論點並排（連出現次數）
+3. **代表引言** —— 真跑手原文（R2 按 likes 揀，R1 實錘全列）
+
+Aggregates 喺生成時由 labels 即場計，唔係硬寫死 —— labels 更新，deck 重出即跟。
 
 ## 輸出格式
 

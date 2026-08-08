@@ -31,18 +31,129 @@ PLATFORM_LABEL = {
     "news": "News",
 }
 
+ANALYSIS_DEFAULT = os.path.join(ROOT, "data", "twoday_community_read.json")
 
-def build_js(rows_by_group, as_of, pending_n):
+STANCES = ["support", "oppose", "mixed", "neutral", "na"]
+STANCE_LABEL = {
+    "support": "Support 2-day",
+    "oppose": "Oppose 2-day",
+    "mixed": "Mixed",
+    "neutral": "Neutral",
+    "na": "N/A",
+}
+
+
+def build_community_read(path):
+    """由 comment-level 分類 labels 計 aggregates（single source of truth：labels）。
+
+    回傳 dict 畀 JS 直接 render；labels 唔啱格式就回 None（deck 照出，冇分析頁）。
+    """
+    with open(path, encoding="utf-8") as f:
+        data = json.load(f)
+    labels = data.get("labels") or []
+    if not labels:
+        return None
+
+    def stance_row(rows):
+        c = Counter(r.get("stance") for r in rows)
+        return [c.get(s, 0) for s in STANCES]
+
+    runners = [r for r in labels if r.get("tier") in ("R1", "R2")]
+    noise = [r for r in labels if r.get("tier") == "S"]
+    unclear = [r for r in labels if r.get("tier") == "U"]
+
+    cohorts = [
+        {"name": f"All comments ({len(labels)})", "row": stance_row(labels)},
+        {
+            "name": (
+                f"Confirmed runners ({len(runners)} — "
+                f"R1×{sum(1 for r in runners if r['tier'] == 'R1')}, "
+                f"R2×{sum(1 for r in runners if r['tier'] == 'R2')})"
+            ),
+            "row": stance_row(runners),
+            "bold": True,
+        },
+        {"name": f"Non-runners / noise ({len(noise)})", "row": stance_row(noise)},
+        {"name": f"Unclassifiable ({len(unclear)})", "row": stance_row(unclear)},
+    ]
+
+    # 真跑手論點矩陣：support vs oppose 兩欄並排
+    def top_args(stance, n=8):
+        c = Counter(
+            r.get("argument")
+            for r in runners
+            if r.get("stance") == stance and r.get("argument") not in (None, "無論點")
+        )
+        return [f"{arg}（{k}）" for arg, k in c.most_common(n)]
+
+    # 代表引言：每個立場按 likes 排頭位（R1 有專列，呢度只抽 R2 免重複；跳過無實質論點嘅）
+    def quotes(stance, n):
+        grp = sorted(
+            (
+                r
+                for r in runners
+                if r.get("stance") == stance
+                and r["tier"] != "R1"
+                and r.get("argument") not in (None, "無論點")
+            ),
+            key=lambda r: -(r.get("lk") or 0),
+        )
+        return [
+            {
+                "stance": STANCE_LABEL[stance],
+                "tier": r["tier"],
+                "text": (r.get("tx") or "").replace("\n", " ").strip()[:150],
+            }
+            for r in grp[:n]
+        ]
+
+    n_oppose_all = sum(1 for r in labels if r.get("stance") == "oppose")
+    n_oppose_noise = sum(1 for r in noise if r.get("stance") == "oppose")
+    nr = stance_row(runners)
+    takeaways = [
+        f"{n_oppose_all} oppose comments overall — but {n_oppose_noise} "
+        f"({round(100 * n_oppose_noise / max(n_oppose_all, 1))}%) come from non-runners, "
+        "mostly road-closure complaints unrelated to race design.",
+        f"Among confirmed runners the split is genuine: support {nr[0]} vs oppose {nr[1]} "
+        f"(mixed {nr[2]}, neutral {nr[3]}).",
+        "Runner support is practical (10K split frees closure budget; HM ballot bottleneck; "
+        "overseas precedent). Runner opposition is about execution trust and atmosphere, "
+        "not the concept.",
+    ]
+
+    return {
+        "as_of": data.get("meta", {}).get("as_of", ""),
+        "n": len(labels),
+        "cohorts": cohorts,
+        "stance_heads": [STANCE_LABEL[s] for s in STANCES],
+        "args_support": top_args("support"),
+        "args_oppose": top_args("oppose"),
+        "quotes": quotes("support", 3) + quotes("oppose", 3) + quotes("mixed", 2),
+        "r1_quotes": [
+            {
+                "stance": STANCE_LABEL.get(r.get("stance"), r.get("stance") or "?"),
+                "tier": "R1",
+                "text": (r.get("tx") or "").replace("\n", " ").strip()[:150],
+            }
+            for r in runners
+            if r["tier"] == "R1"
+        ],
+        "takeaways": takeaways,
+    }
+
+
+def build_js(rows_by_group, as_of, pending_n, community=None):
     """生成 pptxgenjs script。"""
     groups_json = json.dumps(rows_by_group, ensure_ascii=False)
     return f"""
 const pptxgen = require("pptxgenjs");
 const pres = new pptxgen();
 pres.layout = "LAYOUT_WIDE";
-const NAVY="1E2761", ICE="CADCFC", LINEC="D9D9D9", RED="B3261E";
+const NAVY="1E2761", ICE="CADCFC", LINEC="D9D9D9", RED="B3261E", GREEN="2E6E4E";
 const GROUPS = {groups_json};
 const AS_OF = {json.dumps(as_of)};
 const PENDING = {pending_n};
+const COMM = {json.dumps(community, ensure_ascii=False)};
 
 const HEAD = ["Topic","Platform","No. of comments","Link","Community / Note"];
 const COLW = [4.9, 1.35, 1.25, 3.6, 1.5];
@@ -54,9 +165,13 @@ function titleSlide() {{
     x:0.7, y:2.3, w:12, h:1.0, fontSize:32, bold:true, color:"FFFFFF", fontFace:"Arial" }});
   s.addText(`Auto-generated from monitoring database\\nData as of ${{AS_OF}}`, {{
     x:0.7, y:3.5, w:12, h:0.9, fontSize:15, color:ICE, fontFace:"Arial", lineSpacing:22 }});
+  if (COMM) {{
+    s.addText(`Includes community-read analysis: ${{COMM.n}} comments classified by runner evidence`, {{
+      x:0.7, y:4.4, w:12, h:0.4, fontSize:13, color:ICE, fontFace:"Arial" }});
+  }}
   if (PENDING > 0) {{
     s.addText(`⚠ ${{PENDING}} item(s) pending human review — excluded from this deck`, {{
-      x:0.7, y:4.6, w:12, h:0.4, fontSize:13, color:"FFD166", fontFace:"Arial" }});
+      x:0.7, y:4.9, w:12, h:0.4, fontSize:13, color:"FFD166", fontFace:"Arial" }});
   }}
 }}
 
@@ -88,7 +203,69 @@ function tableSlides(groupName, rows) {{
   }}
 }}
 
+function footer(s) {{
+  s.addText("Auto-generated, verify before circulation", {{
+    x:0.35, y:7.02, w:12.6, h:0.3, fontSize:8, italic:true, color:"5A5A5A", fontFace:"Arial" }});
+}}
+
+function communitySlides() {{
+  if (!COMM) return;
+
+  // C1 —— cohort × stance 表 + takeaways
+  let s = pres.addSlide();
+  s.background = {{ color:"FFFFFF" }};
+  s.addText(`Community read — who actually runs? (${{COMM.n}} comments, evidence-tiered)`, {{
+    x:0.35, y:0.18, w:12.6, h:0.45, fontSize:19, bold:true, color:NAVY, fontFace:"Arial" }});
+  const hd = [{{ text:"Cohort", options:{{ bold:true, color:"FFFFFF", fill:{{color:NAVY}}, fontSize:10 }} }}]
+    .concat(COMM.stance_heads.map(h=>({{ text:h, options:{{ bold:true, color:"FFFFFF", fill:{{color:NAVY}}, fontSize:10, align:"center" }} }})));
+  const body = COMM.cohorts.map(c=>{{
+    return [{{ text:c.name, options:{{ fontSize:10, bold:!!c.bold }} }}]
+      .concat(c.row.map(v=>({{ text:String(v), options:{{ fontSize:10, align:"center", bold:!!c.bold }} }})));
+  }});
+  s.addTable([hd].concat(body), {{ x:0.35, y:0.8, w:12.6, colW:[5.1,1.5,1.5,1.5,1.5,1.5],
+    border:{{ type:"solid", color:LINEC, pt:0.75 }}, margin:0.06, fontFace:"Arial", color:"222222" }});
+  s.addText([
+    {{ text:"Key takeaways\\n", options:{{ bold:true, fontSize:13, color:NAVY }} }},
+  ].concat(COMM.takeaways.map(t=>({{ text:"•  "+t+"\\n", options:{{ fontSize:11.5, color:"222222", breakLine:true }} }}))), {{
+    x:0.35, y:3.3, w:12.6, h:2.6, fontFace:"Arial", valign:"top", lineSpacing:19 }});
+  footer(s);
+
+  // C2 —— 真跑手論點矩陣
+  s = pres.addSlide();
+  s.background = {{ color:"FFFFFF" }};
+  s.addText("Confirmed-runner argument matrix", {{
+    x:0.35, y:0.18, w:12.6, h:0.45, fontSize:19, bold:true, color:NAVY, fontFace:"Arial" }});
+  const nrows = Math.max(COMM.args_support.length, COMM.args_oppose.length);
+  const mtr = [[
+    {{ text:"Why runners SUPPORT 2-day", options:{{ bold:true, color:"FFFFFF", fill:{{color:GREEN}}, fontSize:11 }} }},
+    {{ text:"Why runners OPPOSE 2-day", options:{{ bold:true, color:"FFFFFF", fill:{{color:RED}}, fontSize:11 }} }},
+  ]];
+  for (let i=0;i<nrows;i++) mtr.push([
+    {{ text:COMM.args_support[i]||"", options:{{ fontSize:10.5 }} }},
+    {{ text:COMM.args_oppose[i]||"", options:{{ fontSize:10.5 }} }},
+  ]);
+  s.addTable(mtr, {{ x:0.35, y:0.8, w:12.6, colW:[6.3,6.3],
+    border:{{ type:"solid", color:LINEC, pt:0.75 }}, margin:0.06, fontFace:"Arial", color:"222222" }});
+  footer(s);
+
+  // C3 —— 代表引言（真跑手原文）
+  s = pres.addSlide();
+  s.background = {{ color:"FFFFFF" }};
+  s.addText("Verbatim highlights — confirmed runners only", {{
+    x:0.35, y:0.18, w:12.6, h:0.45, fontSize:19, bold:true, color:NAVY, fontFace:"Arial" }});
+  const qh = ["Stance","Tier","Quote"].map(h=>({{ text:h, options:{{ bold:true, color:"FFFFFF", fill:{{color:NAVY}}, fontSize:9.5 }} }}));
+  const qr = COMM.quotes.concat(COMM.r1_quotes).map(q=>[
+    {{ text:q.stance, options:{{ fontSize:8.6, valign:"top" }} }},
+    {{ text:q.tier, options:{{ fontSize:8.6, valign:"top", align:"center", bold:q.tier==="R1" }} }},
+    {{ text:q.text, options:{{ fontSize:8.4, valign:"top" }} }},
+  ]);
+  s.addTable([qh].concat(qr), {{ x:0.35, y:0.72, w:12.6, colW:[1.5,0.8,10.3],
+    border:{{ type:"solid", color:LINEC, pt:0.75 }}, margin:0.04, fontFace:"Arial", color:"222222" }});
+  footer(s);
+}}
+
 titleSlide();
+communitySlides();
 for (const [g, rows] of Object.entries(GROUPS)) {{ tableSlides(g, rows); }}
 pres.writeFile({{ fileName: {json.dumps(os.path.join(OUT, "SCHKM_Annex_auto.pptx"))} }})
   .then(()=>console.log("written"));
@@ -105,6 +282,12 @@ def main():
         default=None,
         help="只出某個賽事週期（預設用 config focus_cycle=2027；傳 all 出晒）",
     )
+    ap.add_argument(
+        "--analysis",
+        default=ANALYSIS_DEFAULT,
+        help="comment-level 分類 labels JSON（預設 data/twoday_community_read.json，存在就自動出分析頁）",
+    )
+    ap.add_argument("--no-analysis", action="store_true", help="唔出 community-read 分析頁")
     args = ap.parse_args()
 
     master = store.load_master()
@@ -165,8 +348,19 @@ def main():
     ]
     ordered = {g: groups[g] for g in ORDER if g in groups}
 
+    community = None
+    if not args.no_analysis and os.path.exists(args.analysis):
+        try:
+            community = build_community_read(args.analysis)
+        except (json.JSONDecodeError, KeyError, TypeError) as e:
+            print(f"分析檔讀取失敗，deck 照出（冇分析頁）：{e}")
+    if community:
+        print(f"community-read 分析頁：{community['n']} 條留言（{args.analysis}）")
+
     os.makedirs(OUT, exist_ok=True)
-    js = build_js(ordered, store.today_str(), 0 if args.include_pending else len(pending))
+    js = build_js(
+        ordered, store.today_str(), 0 if args.include_pending else len(pending), community
+    )
     jsp = os.path.join(OUT, "_build_annex.js")
     with open(jsp, "w", encoding="utf-8") as f:
         f.write(js)
