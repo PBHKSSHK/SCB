@@ -214,3 +214,24 @@ def relevance(text):
     if labs != ["other"]:
         return "adjacent" if strong else "background"
     return "background"
+
+
+def cycle_of(item, cfg):
+    """判斷帖文屬邊個賽事週期。
+
+    規則：cutoff（渣馬2026完賽翌日）當日或之後發佈 → 2027 週期；
+    之前發佈但內文明確指向 2027 → 都算 2027；
+    其餘 2025-08 之後 → 2026 週期；再早 → historic。
+    focus_cycle 以外嘅材料保留做背景層，唔會刪。
+    """
+    cutoff = cfg.get("cycle_cutoff_date", "2026-01-19")
+    kws = cfg.get("cycle_keywords_2027") or []
+    d = item.get("date") or ""
+    txt = item.get("text") or ""
+    if d >= cutoff:
+        return "2027"
+    if any(k in txt for k in kws):
+        return "2027"
+    if d >= "2025-08-01":
+        return "2026"
+    return "historic"

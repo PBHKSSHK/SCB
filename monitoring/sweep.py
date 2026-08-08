@@ -333,6 +333,7 @@ def main():
         c["url"] = u
         c["issue_labels"] = classify.label_text(txt) if txt else []
         c["relevance"] = classify.relevance(txt) if txt else "unknown"
+        c["cycle"] = classify.cycle_of(c, cfg)
         seen[u] = c
     log(f"  剔走噪音 {noise_n} 條（其中銀行線 {bank_n}）；保留 {len(seen)} 條唯一")
 
@@ -415,6 +416,28 @@ def build_report(run_id, args, seen, new_urls, master, stats, cfg, logs, warns, 
     A(f"- 模式：{'輕掃 (light)' if args.light else '全渠道深掃 (full)'}")
     A(f"- 唯一候選：{len(seen)}｜**新帖：{stats['new']}**｜更新：{stats['updated']}")
     A(f"- 資料庫累計：{len(master.get('items', {}))} 條")
+
+    # --- 齊全度指標：fresh vs backfill ---
+    # fresh = 30日窗內發佈（新內容，執到係系統正常運作）
+    # backfill = 30日窗外發佈（舊帖補漏——呢個數連續兩個 run 歸零，
+    #            就係「歷史覆蓋已收斂」嘅可驗證證據）
+    import datetime as _dt
+
+    win = (_dt.date.today() - _dt.timedelta(days=30)).isoformat()
+    fresh_n = sum(1 for u in new_urls if (seen[u].get("date") or "") >= win)
+    backfill_n = len(new_urls) - fresh_n
+    A(f"- **齊全度指標**：新帖中 fresh（30日內發佈）{fresh_n} 條｜"
+      f"backfill（舊帖補漏）{backfill_n} 條")
+    if backfill_n > 5:
+        A(f"  - ⚠️ backfill 偏高——渠道/關鍵詞有變動，或上次覆蓋有洞；"
+          f"下次同一設定重跑，此數應大幅回落")
+    elif backfill_n == 0:
+        A("  - ✅ backfill = 0：歷史覆蓋喺現有渠道設定下已收斂")
+    cyc_counter = {}
+    for u in new_urls:
+        cyc_counter[seen[u].get("cycle", "?")] = cyc_counter.get(seen[u].get("cycle", "?"), 0) + 1
+    A(f"- 週期分佈（新帖）：{'｜'.join(f'{k}: {v}' for k, v in sorted(cyc_counter.items(), reverse=True))}"
+      f"（focus = {cfg.get('focus_cycle', '2027')}）")
     bal = tik.balance()
     if bal is not None:
         A(f"- TikHub 餘額：${bal:.3f}（本次 {tik.calls} calls）")
@@ -449,14 +472,18 @@ def build_report(run_id, args, seen, new_urls, master, stats, cfg, logs, warns, 
             A(f"| {lab}{flag} | {n} |")
         A("")
 
-    # 新帖清單
-    A("## 本次新帖（待核對）")
+    # 新帖清單 —— focus 週期行先，舊週期收埋做背景
+    focus = cfg.get("focus_cycle", "2027")
+    focus_urls = [u for u in new_urls if seen[u].get("cycle") == focus]
+    other_urls = [u for u in new_urls if seen[u].get("cycle") != focus]
+
+    A(f"## 本次新帖（渣馬{focus}週期，待核對）")
     A("")
-    if not new_urls:
+    if not focus_urls:
         A("_（無新帖）_")
         A("")
     else:
-        rows = sorted(new_urls, key=lambda u: (seen[u].get("date") or ""), reverse=True)
+        rows = sorted(focus_urls, key=lambda u: (seen[u].get("date") or ""), reverse=True)
         for u in rows:
             it = seen[u]
             A(f"### [ ] {it.get('date') or '?'} @{it.get('author') or '?'} ({it['platform']})")
@@ -478,6 +505,17 @@ def build_report(run_id, args, seen, new_urls, master, stats, cfg, logs, warns, 
                         f"{(c.get('text') or '')[:120]}".replace("\n", " ")
                     )
             A("")
+
+    if other_urls:
+        A(f"## 舊週期背景（{len(other_urls)} 條，唔入 {focus} annex，只作歷史脈絡）")
+        A("")
+        for u in sorted(other_urls, key=lambda x: (seen[x].get("date") or ""), reverse=True):
+            it = seen[u]
+            A(
+                f"- `{it.get('cycle')}` {it.get('date')} @{it.get('author')} "
+                f"[{it.get('relevance')}] ♥{it.get('likes')} — {u}"
+            )
+        A("")
 
     A("## 人手核對清單")
     A("")

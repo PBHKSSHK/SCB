@@ -36,6 +36,12 @@ def canon_url(u):
     return u
 
 
+def load_config():
+    cfg_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config.json")
+    with open(cfg_path, encoding="utf-8") as f:
+        return json.load(f)
+
+
 def load_master():
     if not os.path.exists(MASTER):
         return {"items": {}, "runs": []}

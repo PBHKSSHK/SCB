@@ -100,6 +100,11 @@ def main():
     ap.add_argument("--include-pending", action="store_true")
     ap.add_argument("--approve-run", help="將某次 run 嘅 pending 條目標記為 approved")
     ap.add_argument("--approve-all", action="store_true", help="批准全部 pending（慎用）")
+    ap.add_argument(
+        "--cycle",
+        default=None,
+        help="只出某個賽事週期（預設用 config focus_cycle=2027；傳 all 出晒）",
+    )
     args = ap.parse_args()
 
     master = store.load_master()
@@ -121,6 +126,15 @@ def main():
         (approved if it.get("review_status") == "approved" else pending).append(it)
 
     use = approved + (pending if args.include_pending else [])
+
+    # 週期過濾：預設只出 focus 週期（渣馬2027），舊週期材料唔入 annex
+    cfg = store.load_config()
+    focus = args.cycle or cfg.get("focus_cycle", "2027")
+    if focus != "all":
+        before_n = len(use)
+        use = [it for it in use if it.get("cycle", "2027") == focus]
+        print(f"週期過濾：{before_n} → {len(use)} 條（cycle={focus}；--cycle all 可出晒）")
+
     if not use:
         print("冇 approved 條目。先核對報告，再行 --approve-run 或 --approve-all")
         return
