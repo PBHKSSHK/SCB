@@ -58,6 +58,18 @@ def build_community_read(path):
         c = Counter(r.get("stance") for r in rows)
         return [c.get(s, 0) for s in STANCES]
 
+    # 未知 stance/tier 唔會靜默流失：出聲警告（cohort 行加埋應該等於 N）
+    bad_stance = Counter(
+        r.get("stance") for r in labels if r.get("stance") not in STANCES
+    )
+    bad_tier = Counter(
+        r.get("tier") for r in labels if r.get("tier") not in ("R1", "R2", "S", "U")
+    )
+    if bad_stance:
+        print(f"⚠ 分析檔有未知 stance（唔會計入立場欄）：{dict(bad_stance)}")
+    if bad_tier:
+        print(f"⚠ 分析檔有未知 tier（唔會入任何 cohort）：{dict(bad_tier)}")
+
     runners = [r for r in labels if r.get("tier") in ("R1", "R2")]
     noise = [r for r in labels if r.get("tier") == "S"]
     unclear = [r for r in labels if r.get("tier") == "U"]
@@ -352,8 +364,10 @@ def main():
     if not args.no_analysis and os.path.exists(args.analysis):
         try:
             community = build_community_read(args.analysis)
-        except (json.JSONDecodeError, KeyError, TypeError) as e:
-            print(f"分析檔讀取失敗，deck 照出（冇分析頁）：{e}")
+        except Exception as e:  # 壞檔任何形式都唔可以拖冧正常 annex 出 deck
+            print(f"分析檔讀取失敗，deck 照出（冇分析頁）：{type(e).__name__}: {e}")
+    elif not args.no_analysis and args.analysis != ANALYSIS_DEFAULT:
+        print(f"⚠ --analysis 指定嘅檔唔存在，deck 冇分析頁：{args.analysis}")
     if community:
         print(f"community-read 分析頁：{community['n']} 條留言（{args.analysis}）")
 
