@@ -147,6 +147,43 @@ def build_community_read(path):
 
     meta = data.get("meta") or {}
     sources = meta.get("sources") or []
+    src_by_ref = {s.get("ref"): s for s in sources}
+
+    # Source evidence：P5 論點背後嘅真跑手原文，按 S# 源帖分組
+    def _ref_key(ref):
+        return int(ref[1:]) if ref and ref[1:].isdigit() else 99
+
+    p5_backing = [
+        r
+        for r in runners
+        if r.get("stance") in ("support", "oppose")
+        and r.get("argument") not in (None, "無論點")
+    ]
+    evidence = []
+    for ref in sorted({r.get("src") for r in p5_backing if r.get("src")}, key=_ref_key):
+        m = src_by_ref.get(ref, {})
+        rows = sorted(
+            (r for r in p5_backing if r.get("src") == ref),
+            key=lambda r: (r.get("stance"), r.get("argument") or ""),
+        )
+        evidence.append(
+            {
+                "ref": ref,
+                "platform": m.get("platform", ""),
+                "date": m.get("date", ""),
+                "title": m.get("title", ""),
+                "url": m.get("url", ""),
+                "rows": [
+                    {
+                        "tier": r["tier"],
+                        "stance": STANCE_LABEL.get(r.get("stance"), r.get("stance") or "?"),
+                        "argument": r.get("argument", ""),
+                        "text": (r.get("tx") or "").replace("\n", " ").strip()[:200],
+                    }
+                    for r in rows
+                ],
+            }
+        )
 
     methodology = [
         {"h": "Unit of analysis", "b": [
@@ -190,6 +227,7 @@ def build_community_read(path):
         ],
         "takeaways": takeaways,
         "sources": sources,
+        "evidence": evidence,
         "methodology": methodology,
         "pie_tier": {
             "labels": [
@@ -382,6 +420,45 @@ function communitySlides() {{
   s.addTable([qh].concat(qr), {{ x:0.35, y:0.72, w:12.6, colW:[1.4,0.7,0.7,9.8],
     border:{{ type:"solid", color:LINEC, pt:0.75 }}, margin:0.04, fontFace:"Arial", color:"222222" }});
   footer(s);
+
+  // C4 —— Source evidence 附錄：P5 每個論點背後嘅真跑手原文，按 S# 分組
+  // 逐條 flatten，每頁最多 ~14 行（含 source 標題行），自動分頁
+  const EV = COMM.evidence || [];
+  const flat = [];
+  EV.forEach(src=>{{
+    flat.push({{ kind:"hdr", src }});
+    src.rows.forEach(r=>flat.push({{ kind:"row", src, r }}));
+  }});
+  const EPP = 13;
+  for (let i=0; i<flat.length; i+=EPP) {{
+    const chunk = flat.slice(i, i+EPP);
+    const s2 = pres.addSlide();
+    s2.background = {{ color:"FFFFFF" }};
+    const pno = Math.floor(i/EPP)+1, ptot = Math.ceil(flat.length/EPP);
+    s2.addText(`Source evidence — runner comments behind the argument matrix (${{pno}}/${{ptot}})`, {{
+      x:0.35, y:0.18, w:12.6, h:0.45, fontSize:17, bold:true, color:NAVY, fontFace:"Arial" }});
+    const th = ["Source","Tier","Stance","Argument","Verbatim comment"].map(h=>({{ text:h, options:{{ bold:true, color:"FFFFFF", fill:{{color:NAVY}}, fontSize:9 }} }}));
+    const trows = [th];
+    chunk.forEach(item=>{{
+      if (item.kind==="hdr") {{
+        const m=item.src;
+        trows.push([{{ text:`${{m.ref}} — ${{m.platform}} ${{m.date||""}} — ${{m.title}}  |  ${{m.url}}`,
+          options:{{ fontSize:8.4, bold:true, color:"FFFFFF", fill:{{color:GREEN}}, colspan:5, hyperlink:{{ url:m.url }} }} }}]);
+      }} else {{
+        const r=item.r;
+        trows.push([
+          {{ text:item.src.ref, options:{{ fontSize:8.2, valign:"top", align:"center" }} }},
+          {{ text:r.tier, options:{{ fontSize:8.2, valign:"top", align:"center", bold:r.tier==="R1" }} }},
+          {{ text:r.stance, options:{{ fontSize:8.2, valign:"top" }} }},
+          {{ text:r.argument, options:{{ fontSize:8.2, valign:"top" }} }},
+          {{ text:r.text, options:{{ fontSize:8.2, valign:"top" }} }},
+        ]);
+      }}
+    }});
+    s2.addTable(trows, {{ x:0.35, y:0.72, w:12.6, colW:[0.6,0.6,1.35,2.15,7.9],
+      border:{{ type:"solid", color:LINEC, pt:0.75 }}, margin:0.04, fontFace:"Arial", color:"222222", autoPage:false }});
+    footer(s2);
+  }}
 }}
 
 titleSlide();
