@@ -115,6 +115,14 @@ class TikHub:
             p["pagination_token"] = pagination_token
         return self.try_get("instagram/v2/fetch_post_comments", **p)
 
+    def ig_comment_replies(self, code_or_url, comment_id):
+        """一條 IG 留言下面嘅 replies（nested layer——頂層端點唔會回）。"""
+        return self.try_get(
+            "instagram/v2/fetch_comment_replies",
+            code_or_url=code_or_url,
+            comment_id=comment_id,
+        )
+
     def ig_hashtag_posts(self, hashtag, end_cursor=None):
         p = {"hashtag": hashtag}
         if end_cursor:

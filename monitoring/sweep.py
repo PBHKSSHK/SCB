@@ -187,67 +187,136 @@ def _dig_ig_items(payload):
 
 # ---------------- L2: 抽取留言 ----------------
 
-def pull_threads_comments(tik, url, log):
+def _threads_caption(p):
+    cap = p.get("caption")
+    if isinstance(cap, dict):
+        return (cap.get("text") or "").strip()
+    return (cap or "").strip() if isinstance(cap, str) else ""
+
+
+def pull_threads_comments(tik, url, log, max_child_walks=15):
+    """Threads 留言，包括 nested replies。
+
+    fetch_post_detail_v2 只回頂層；每條 reply 本身係一個 post，
+    有 direct_reply_count 就要用佢自己嘅 URL 再 detail 一次先攞到下層
+    （2026-08 人手對數發現：淨頂層會漏 ~1/3 留言，而且 nested 層
+    跑手密度最高）。max_child_walks 限 API 開支，drc 大嗰啲行先。
+    """
     d = tik.threads_post_detail(url)
     posts = ((d or {}).get("data") or {}).get("posts") or []
     if not posts:
         return None, []
     root = posts[0]
-    pid = root.get("post_id")
+    root_code = root.get("code")
     detail = {
-        "text": (root.get("caption") or "").strip(),
+        "text": _threads_caption(root),
         "likes": root.get("like_count"),
         "date": ts_to_date(root.get("taken_at")),
         "author": (root.get("user") or {}).get("username"),
     }
-    c = tik.threads_comments(pid) if pid else None
-    cd = (c or {}).get("data") or {}
+
     comments = []
-    for e in cd.get("edges", []):
-        for ti in e.get("node", {}).get("thread_items", []):
-            p = ti.get("post") or {}
-            if p.get("pk") == pid:
-                continue
-            txt = (p.get("caption") or {}).get("text") or ""
-            if not txt.strip():
-                continue
-            comments.append(
-                {
-                    "author": (p.get("user") or {}).get("username"),
-                    "text": txt.strip(),
-                    "likes": p.get("like_count"),
-                    "speaker": classify.speaker_type(txt),
-                    "labels": classify.label_text(txt),
-                }
-            )
+    seen_codes = {root_code}
+
+    def add_post(p, depth):
+        code = p.get("code")
+        if not code or code in seen_codes:
+            return
+        seen_codes.add(code)
+        txt = _threads_caption(p)
+        if not txt:
+            return
+        comments.append(
+            {
+                "author": (p.get("user") or {}).get("username"),
+                "text": txt,
+                "likes": p.get("like_count"),
+                "depth": depth,
+                "speaker": classify.speaker_type(txt),
+                "labels": classify.label_text(txt),
+            }
+        )
+
+    tops = posts[1:]
+    for p in tops:
+        add_post(p, 0)
+
+    walkable = sorted(
+        (p for p in tops if p.get("direct_reply_count")),
+        key=lambda p: -(p.get("direct_reply_count") or 0),
+    )
+    skipped = len(walkable) - max_child_walks if len(walkable) > max_child_walks else 0
+    for p in walkable[:max_child_walks]:
+        if tik.budget_exhausted():
+            log(f"   （nested walk 中止：TikHub 時間預算用完，剩 {len(walkable)} 條未行）")
+            break
+        u = (p.get("user") or {}).get("username")
+        code = p.get("code")
+        if not u or not code:
+            continue
+        d2 = tik.threads_post_detail(f"https://www.threads.com/@{u}/post/{code}")
+        for q in ((d2 or {}).get("data") or {}).get("posts") or []:
+            add_post(q, 1)
+    if skipped:
+        log(f"   （nested walk 上限 {max_child_walks}，跳過咗 {skipped} 條低回覆數嘅）")
     return detail, comments
 
 
-def pull_ig_comments(tik, url, log):
+def pull_ig_comments(tik, url, log, max_child_walks=10):
+    """IG 留言，包括 nested replies。
+
+    fetch_post_comments 只回頂層；child_comment_count > 0 嘅要另 call
+    fetch_comment_replies 先攞到下層。max_child_walks 限 API 開支。
+    """
     m = re.search(r"/p/([A-Za-z0-9_-]+)", url)
     if not m:
         return []
-    d = tik.ig_comments(m.group(1))
+    code = m.group(1)
+    d = tik.ig_comments(code)
     if not d:
         return []
     inner = (d.get("data") or {})
     inner = inner.get("data", inner)
     items = inner.get("items") or inner.get("comments") or []
     out = []
-    for c in items:
-        txt = c.get("text") or ""
-        if not txt.strip():
-            continue
+
+    def add_item(c, depth):
+        txt = (c.get("text") or "").strip()
+        if not txt:
+            return
         u = c.get("user") or {}
         out.append(
             {
                 "author": u.get("username") if isinstance(u, dict) else c.get("username"),
-                "text": txt.strip(),
+                "text": txt,
                 "likes": c.get("comment_like_count") or c.get("like_count"),
+                "depth": depth,
                 "speaker": classify.speaker_type(txt),
                 "labels": classify.label_text(txt),
             }
         )
+
+    for c in items:
+        add_item(c, 0)
+
+    walkable = sorted(
+        (c for c in items if (c.get("child_comment_count") or 0) > 0),
+        key=lambda c: -(c.get("child_comment_count") or 0),
+    )
+    for c in walkable[:max_child_walks]:
+        if tik.budget_exhausted():
+            log("   （IG nested walk 中止：TikHub 時間預算用完）")
+            break
+        cid = c.get("pk") or c.get("id")
+        if not cid:
+            continue
+        d2 = tik.ig_comment_replies(code, cid)
+        inner2 = ((d2 or {}).get("data") or {})
+        inner2 = inner2.get("data", inner2)
+        for q in inner2.get("items") or []:
+            add_item(q, 1)
+    if len(walkable) > max_child_walks:
+        log(f"   （IG nested walk 上限 {max_child_walks}，跳過 {len(walkable)-max_child_walks} 條）")
     return out
 
 
