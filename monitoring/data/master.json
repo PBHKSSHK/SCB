@@ -11942,6 +11942,25 @@
    "comments_pulled": 7,
    "replies": 7,
    "human_notes": "用戶 Meta 內部 search 發現 crawler 漏網；Apify/TikHub 抽取"
+  },
+  "https://www.discuss.com.hk/viewthread.php?tid=32200587": {
+   "url": "https://www.discuss.com.hk/viewthread.php?tid=32200587",
+   "platform": "hkdiscuss",
+   "date": "2026-04-14",
+   "first_seen": "2026-08-10",
+   "text": "香討 大棋盤｜渣馬研分兩日舉行 封路安排費思量",
+   "issue_labels": [
+    "two-day-format",
+    "road-closure"
+   ],
+   "relevance": "direct",
+   "origin": "human-add",
+   "source_channel": "human-add",
+   "review_status": "approved",
+   "cycle": "2027",
+   "comments_pulled": 29,
+   "replies": 42,
+   "human_notes": "用戶Meta search發現；Bright Data unlocker 撈到（sheet URL ptid斷咗字尾，真ID 32200587）"
   }
  },
  "runs": [
