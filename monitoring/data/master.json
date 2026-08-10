@@ -11834,6 +11834,42 @@
    "text": "28/6 第一次海外跑🥳🥳 日本跑步真係同香港爭好遠 ，真係超級好氣氛👍🏻😃 配套亦都好好， 沿途會好多市民同選手打氣 ，亦都準備冰凍嘅水、可樂 、食物😋， 氣溫都差唔多去到24度 ，個太陽強度太勁🌞🔥不斷親吻我 ，沿途仲有水機 💦噴身為跑手消暑降溫，沿途風景街+療癒港灣美景 ，跑完之後有說不出的快樂和滿足感 🩵🩵 不過今次日本賽事要全馬先有獎牌🥲 半馬就算指定內時間完成都冇獎牌🙈 ，但係呢個都係一個美好嘅回憶🥰 \n\n#北海道函館馬拉松28/6/2026 \n#有自己的幸福方程式做讓你感到開心的事",
    "url": "https://www.threads.com/@zoeyll/post/Dawh6BuE7T4",
    "cycle": "2027"
+  },
+  "https://www.facebook.com/inmediahknet/posts/pfbid07hJ1gArxXXr52JfUnxviXjX7849DWw56HPGZhckVAgs17HvFspi7gG9zRhmAH4hpl": {
+   "url": "https://www.facebook.com/inmediahknet/posts/pfbid07hJ1gArxXXr52JfUnxviXjX7849DWw56HPGZhckVAgs17HvFspi7gG9zRhmAH4hpl",
+   "platform": "facebook",
+   "date": "2026-01-19",
+   "first_seen": "2026-08-10",
+   "text": "獨媒 霍啟剛倡渣馬分兩日",
+   "issue_labels": [
+    "two-day-format"
+   ],
+   "relevance": "direct",
+   "origin": "human-add",
+   "source_channel": "human-add",
+   "review_status": "approved",
+   "cycle": "2027",
+   "comments_pulled": 108,
+   "replies": 108,
+   "human_notes": "用戶指出 crawler 漏咗 FB（獨媒FB對應帖/跑步關注組group帖）；Apify 抽取"
+  },
+  "https://www.facebook.com/groups/1852485348459116/posts/2731225587251750/": {
+   "url": "https://www.facebook.com/groups/1852485348459116/posts/2731225587251750/",
+   "platform": "facebook",
+   "date": "2026-01",
+   "first_seen": "2026-08-10",
+   "text": "香港跑步關注組 渣馬分兩日",
+   "issue_labels": [
+    "two-day-format"
+   ],
+   "relevance": "direct",
+   "origin": "human-add",
+   "source_channel": "human-add",
+   "review_status": "approved",
+   "cycle": "2027",
+   "comments_pulled": 27,
+   "replies": 27,
+   "human_notes": "用戶指出 crawler 漏咗 FB（獨媒FB對應帖/跑步關注組group帖）；Apify 抽取"
   }
  },
  "runs": [

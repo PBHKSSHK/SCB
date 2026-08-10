@@ -134,9 +134,11 @@ class TikHub:
 # ---------------- Apify ----------------
 
 class Apify:
-    """Threads 關鍵詞搜尋（有日期範圍）＋ Facebook。"""
+    """Threads 關鍵詞搜尋（有日期範圍）＋ Facebook 帖/留言。"""
 
     THREADS_ACTOR = "futurizerush~meta-threads-scraper"
+    FB_COMMENTS_ACTOR = "apify~facebook-comments-scraper"
+    FB_POSTS_ACTOR = "apify~facebook-posts-scraper"
 
     def __init__(self):
         self.token = _token("APIFY_TOKEN", "Apify")
@@ -178,6 +180,45 @@ class Apify:
             self.THREADS_ACTOR,
             {"mode": "user", "usernames": usernames, "max_posts": max_posts},
         )
+
+    def fb_post_comments(self, url, limit=400, nested=True):
+        """FB 帖（page 或公開 group）嘅留言。closed group 抽唔到 —— actor 冇登入。
+
+        回傳 list[dict]：author/text/like/date/depth（正規化，同 corpus 格式一致）。
+        """
+        raw = self.run_actor_sync(
+            self.FB_COMMENTS_ACTOR,
+            {
+                "startUrls": [{"url": url}],
+                "resultsLimit": limit,
+                "includeNestedComments": nested,
+                "viewOption": "RANKED_UNFILTERED",
+            },
+        )
+        out = []
+        for c in raw if isinstance(raw, list) else []:
+            txt = (c.get("text") or "").strip()
+            if not txt:
+                continue
+            out.append(
+                {
+                    "author": c.get("profileName") or "",
+                    "text": txt,
+                    "like": c.get("likesCount") or 0,
+                    "date": c.get("date") or "",
+                    "depth": c.get("threadingDepth", 0),
+                }
+            )
+        return out
+
+    def fb_page_posts(self, page_url, limit=50, newer_than=None, older_than=None):
+        """FB 專頁近期帖（可用日期窗口收窄，搵歷史帖必須設窗口）。"""
+        payload = {"startUrls": [{"url": page_url}], "resultsLimit": limit}
+        if newer_than:
+            payload["onlyPostsNewerThan"] = newer_than
+        if older_than:
+            payload["onlyPostsOlderThan"] = older_than
+        return self.run_actor_sync(self.FB_POSTS_ACTOR, payload)
 
     def month_usage_usd(self):
         try:

@@ -29,7 +29,8 @@ python3 monitoring/add_link.py "url" --no-comments
 ## 自動做嘅嘢
 
 - 判別平台（threads / instagram / facebook / lihkg / hkdiscuss）
-- Threads / IG：自動抽帖文全文 + 留言（連 handle）
+- Threads / IG：自動抽帖文全文 + 留言（連 handle）—— 需要 `TIKHUB_API_KEY`
+- FB（專頁帖 + **公開** group 帖）：自動抽留言 —— 需要 `APIFY_TOKEN`；closed group 冇 API 途徑，會警告叫你人手處理
 - 打議題標籤、判斷相關度
 - **作者自動加入 watchlist** —— 下次掃描會覆蓋佢
 - 標記 `review_status = approved`（人手加入視為已核實）

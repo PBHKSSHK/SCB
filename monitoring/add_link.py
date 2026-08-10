@@ -14,7 +14,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from lib import classify, store  # noqa: E402
-from lib.clients import TikHub  # noqa: E402
+from lib.clients import Apify, TikHub  # noqa: E402
 
 
 def detect_platform(url):
@@ -40,11 +40,16 @@ def main():
 
     master = store.load_master()
     tik = None
+    apy = None
     if not args.no_comments:
         try:
             tik = TikHub()
         except Exception as e:  # noqa: BLE001
-            print(f"（無法抽留言：{e}）")
+            print(f"（無法抽 Threads/IG 留言：{e}）")
+        try:
+            apy = Apify()
+        except Exception as e:  # noqa: BLE001
+            print(f"（無法抽 FB 留言：{e}）")
 
     import sweep
 
@@ -71,6 +76,15 @@ def main():
         elif tik and plat == "instagram":
             item["comments"] = sweep.pull_ig_comments(tik, u, lambda *a, **k: None)
             item["comments_pulled"] = len(item["comments"])
+        elif apy and plat == "facebook":
+            # page 帖同公開 group 帖都得；closed group 會回 0 條（actor 冇登入）
+            try:
+                item["comments"] = apy.fb_post_comments(u)
+                item["comments_pulled"] = len(item["comments"])
+                if not item["comments"] and "/groups/" in u:
+                    print("   ⚠ 0 條留言 —— 可能係 closed group（無 API 途徑），要人手")
+            except Exception as e:  # noqa: BLE001
+                print(f"   ⚠ FB 抽留言失敗：{str(e)[:120]}")
 
         txt = item.get("text") or ""
         item["issue_labels"] = classify.label_text(txt) if txt else []

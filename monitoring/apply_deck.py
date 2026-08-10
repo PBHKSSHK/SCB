@@ -58,6 +58,13 @@ def build_community_read(path):
         c = Counter(r.get("stance") for r in rows)
         return [c.get(s, 0) for s in STANCES]
 
+    def _lk(r):
+        """likes 排序用 —— API 有時回字串，唔可以畀佢冧 build。"""
+        try:
+            return int(r.get("lk") or 0)
+        except (ValueError, TypeError):
+            return 0
+
     # 未知 stance/tier 唔會靜默流失：出聲警告（cohort 行加埋應該等於 N）
     bad_stance = Counter(
         r.get("stance") for r in labels if r.get("stance") not in STANCES
@@ -119,7 +126,7 @@ def build_community_read(path):
                 and r["tier"] != "R1"
                 and r.get("argument") not in (None, "無論點")
             ),
-            key=lambda r: -(r.get("lk") or 0),
+            key=lambda r: -_lk(r),
         )
         return [
             {

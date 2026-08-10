@@ -25,6 +25,16 @@ Repo 唯一 branch：`claude/hong-kong-marathon-one-two-day-ejweky`。
 - [ ] **S10 源帖日期 TBC**（fitz FB 帖唔喺 master，人手補：`data/twoday_community_read.json` meta.sources）
 - [ ] 用戶提供咗一份 **FB 跑步 groups Excel**（26 groups × ~140 帳號 R/V 矩陣）——**未入庫**，同 monitoring DB 係兩件事
 - [ ] Deck 出街前：人手開 pptx 覆核 + 抽查 3-5 條連結
+- [ ] 用戶想試 **FB 關鍵詞直搜**（Apify，唔靠 Google site:）掃漏網 FB 帖/group——未跑，等確認
+- [ ] 源帖**網頁截圖**：本機瀏覽器出網被封；用戶考慮加 Bright Data MCP（見對話）
+
+## 2026-08-10 更新：FB 補漏
+
+用戶指出 crawler 漏咗 FB：獨媒 FB 帖（S11，108 條留言）+ 香港跑步關注組 group 帖（S12，27 條）。
+已用 Apify（`APIFY_TOKEN`，見 `.env.example`）抽取、分類、audit、併入 corpus/labels/master。
+發現：FB 噪音率 84%（獨媒 FB 108 條僅 4 個真跑手）。合併後 506 條、跑手 112、
+反對聲 79% 係非跑手。`add_link.py` 而家識自動抽 FB 留言（公開帖；closed group 會警告）。
+TikHub **冇** FB 端點（985 個端點確認過）——FB 只能行 Apify。
 
 ## 新 session 點接手
 
