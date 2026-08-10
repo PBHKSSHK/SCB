@@ -1,23 +1,26 @@
 # SCHKM 監察項目 —— Session Handoff
 
-> 畀新 Claude session（或另一個 account）接手用。讀完呢份 + `README.md`，唔使歷史對話都可以繼續做嘢。
+> 畀新 Claude session（或另一個 account）接手用。閱讀次序：呢份 → `PIPELINE.md`（全部平台/API/rules）→ `RUBRIC.md`（分類規則）→ `README.md`（操作）。唔使歷史對話都可以繼續做嘢。
 
 ## 項目係乜
 
 渣打香港馬拉松（SCHKM）「一日 vs 兩日」議題嘅社交輿情監察，恆常更新 Neutralization deck 嘅 annex。
 Repo 唯一 branch：`claude/hong-kong-marathon-one-two-day-ejweky`。
 
-## 而家去到邊（2026-08-10）
+## 而家去到邊（2026-08-10 最新）
 
 1. **監察系統**（`monitoring/`）行緊：sweep → 人手核對 → apply_deck 出 pptx。
-   - `master.json`：138 帖（82 approved / 56 **pending 未核對**）
-2. **Phase 0 語料**：`data/phase0_twoday_corpus.json` —— 10 個「一日vs兩日」帖 + 371 條留言
-3. **留言分類**（`data/twoday_community_read.json`）：371 條逐條分級
-   - R1 實錘跑手 5 / R2 疑似跑手 95 / S 唔跑抽水 195 / U 判唔到 76
-   - 核心發現：**反對聲 74% 嚟自唔跑步嘅人；真跑手 support 32 vs oppose 27，意見分裂**
-   - 方法：10 個並行分類 agent + 1 個嚴格 audit（降級 6 條假陽性）
-4. **Annex deck**（`out/SCHKM_Annex_auto.pptx`，17 頁）：
-   title → methodology → cohort×stance+pies → sources(S1-S10) → 論點矩陣 → 引言 → annex 表(有 Date 欄)
+   - `master.json`：145 帖（88 approved + 56 **pending 未核對** + human-add）
+2. **語料**：`data/phase0_twoday_corpus.json` —— **18 個源帖（S1–S17）+ 841 條留言**
+   （Threads×5 / IG×3 / FB專頁×4 / FB公開group×2 / LIHKG×2 / 香討×1；含 nested replies）
+3. **留言分類**（`data/twoday_community_read.json`）：841 條逐條 label，經 audit + 用戶QC retag
+   - R1 實錘 11 / R2 疑似 171 / S 抽水 515 / U 判唔到 144 → **真跑手 182**
+   - 核心發現：**反對聲 ~83% 嚟自唔跑步嘅人（主因封路擾民）；真跑手 43 支持 vs 42 反對——真・五五波**
+   - 跑手支持論點：10K拆走封路唔加/半馬樽頸/海外分兩日先例
+   - 跑手反對論點：氣氛分薄/唔信田總執行/連一日都未搞好/星期六返工/凌晨起步
+4. **Annex deck**（`out/SCHKM_Annex_auto.pptx`，27 頁）：
+   title → methodology → cohort×stance+兩pie → sources(S1-S17連結) → 論點矩陣(帶S#) → 引言 → source evidence 附錄×6 → annex 表(Date欄)
+5. **源帖網頁截圖**：`out/screencaps/` 14 張（Bright Data；IG 3 張要人手）
 
 ## 未完成 / 等緊人
 
