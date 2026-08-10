@@ -89,14 +89,25 @@ def build_community_read(path):
         {"name": f"Unclassifiable ({len(unclear)})", "row": stance_row(unclear)},
     ]
 
-    # 真跑手論點矩陣：support vs oppose 兩欄並排
+    # 真跑手論點矩陣：support vs oppose 兩欄並排，每個論點附源帖 ref
     def top_args(stance, n=8):
         c = Counter(
             r.get("argument")
             for r in runners
             if r.get("stance") == stance and r.get("argument") not in (None, "無論點")
         )
-        return [f"{arg}（{k}）" for arg, k in c.most_common(n)]
+        out = []
+        for arg, k in c.most_common(n):
+            refs = sorted(
+                {
+                    r.get("src")
+                    for r in runners
+                    if r.get("stance") == stance and r.get("argument") == arg and r.get("src")
+                },
+                key=lambda s: int(s[1:]),
+            )
+            out.append({"t": f"{arg}（{k}）", "refs": " ".join(refs)})
+        return out
 
     # 代表引言：每個立場按 likes 排頭位（R1 有專列，呢度只抽 R2 免重複；跳過無實質論點嘅）
     def quotes(stance, n):
@@ -114,6 +125,7 @@ def build_community_read(path):
             {
                 "stance": STANCE_LABEL[stance],
                 "tier": r["tier"],
+                "src": r.get("src") or "",
                 "text": (r.get("tx") or "").replace("\n", " ").strip()[:150],
             }
             for r in grp[:n]
@@ -133,8 +145,33 @@ def build_community_read(path):
         "not the concept.",
     ]
 
+    meta = data.get("meta") or {}
+    sources = meta.get("sources") or []
+
+    methodology = [
+        {"h": "Unit of analysis", "b": [
+            "Every public comment under the 10 source posts (S1–S10) discussing the "
+            "1-day vs 2-day question — 371 comments after dedup/noise filter."]},
+        {"h": "Step 1 — Evidence tier (who is speaking?)", "b": [
+            "R1 Confirmed runner: first-person race evidence — own ballot/entry, finish, PB, "
+            "pace, training, runner-pack pickup, ran an overseas race.",
+            "R2 Likely runner: no first-person proof, but race-structure knowledge — start-wave "
+            "spacing, Gold/Platinum Label, course overlap, closure hours, two-day precedents.",
+            "S Non-runner / noise: zero running signal — road-closure complaints, jokes, pile-ons.",
+            "U Unclassifiable: too short, news repost, or off-topic.",
+            "Perspective test: argued from a runner's perspective with concrete race detail → "
+            "R1/R2. Stance alone proves nothing — 「支持但我跑唔到」 is NOT a runner."]},
+        {"h": "Step 2 — Stance on the 2-day format", "b": [
+            "support / oppose / mixed / neutral / n.a. — judged independently of tier."]},
+        {"h": "Step 3 — Argument tag", "b": [
+            "One short tag per comment（e.g. 10K拆走封路唔加・氣氛分薄・唔信田總執行）."]},
+        {"h": "Step 4 — Strict audit pass", "b": [
+            "A second, adversarial pass re-judged all 104 initial R1/R2; 6 were downgraded "
+            "(news quoters, 「我跑唔到」, pure politician-bashing). Final: 100 confirmed runners."]},
+    ]
+
     return {
-        "as_of": data.get("meta", {}).get("as_of", ""),
+        "as_of": meta.get("as_of", ""),
         "n": len(labels),
         "cohorts": cohorts,
         "stance_heads": [STANCE_LABEL[s] for s in STANCES],
@@ -145,12 +182,29 @@ def build_community_read(path):
             {
                 "stance": STANCE_LABEL.get(r.get("stance"), r.get("stance") or "?"),
                 "tier": "R1",
+                "src": r.get("src") or "",
                 "text": (r.get("tx") or "").replace("\n", " ").strip()[:150],
             }
             for r in runners
             if r["tier"] == "R1"
         ],
         "takeaways": takeaways,
+        "sources": sources,
+        "methodology": methodology,
+        "pie_tier": {
+            "labels": [
+                f"Confirmed runners ({len(runners)})",
+                f"Non-runners / noise ({len(noise)})",
+                f"Unclassifiable ({len(unclear)})",
+            ],
+            "values": [len(runners), len(noise), len(unclear)],
+        },
+        "pie_runner_stance": {
+            "labels": [
+                f"{STANCE_LABEL[s]} ({v})" for s, v in zip(STANCES, stance_row(runners))
+            ],
+            "values": stance_row(runners),
+        },
     }
 
 
@@ -167,8 +221,8 @@ const AS_OF = {json.dumps(as_of)};
 const PENDING = {pending_n};
 const COMM = {json.dumps(community, ensure_ascii=False)};
 
-const HEAD = ["Topic","Platform","No. of comments","Link","Community / Note"];
-const COLW = [4.9, 1.35, 1.25, 3.6, 1.5];
+const HEAD = ["Topic","Date","Platform","No. of comments","Link","Community / Note"];
+const COLW = [4.35, 0.95, 1.2, 1.15, 3.55, 1.4];
 
 function titleSlide() {{
   const s = pres.addSlide();
@@ -201,6 +255,7 @@ function tableSlides(groupName, rows) {{
       const isNew = r.is_new;
       tr.push([
         {{ text:r.topic, options:{{ fontSize:8.4, valign:"top", color: isNew?RED:"222222", bold: isNew }} }},
+        {{ text:r.date||"", options:{{ fontSize:8.4, valign:"top" }} }},
         {{ text:r.platform, options:{{ fontSize:8.6, valign:"top" }} }},
         {{ text:String(r.comments), options:{{ fontSize:8.6, valign:"top", align:"center" }} }},
         {{ text:r.link, options:{{ fontSize:7.2, valign:"top", color:"1155CC" }} }},
@@ -223,8 +278,21 @@ function footer(s) {{
 function communitySlides() {{
   if (!COMM) return;
 
-  // C1 —— cohort × stance 表 + takeaways
+  // C0 —— 分類 methodology
   let s = pres.addSlide();
+  s.background = {{ color:"FFFFFF" }};
+  s.addText("Classification methodology", {{
+    x:0.35, y:0.18, w:12.6, h:0.45, fontSize:19, bold:true, color:NAVY, fontFace:"Arial" }});
+  const mruns = [];
+  (COMM.methodology||[]).forEach(sec=>{{
+    mruns.push({{ text:sec.h+"\\n", options:{{ bold:true, fontSize:12.5, color:NAVY, breakLine:true }} }});
+    sec.b.forEach(line=>mruns.push({{ text:"•  "+line+"\\n", options:{{ fontSize:10.5, color:"222222", breakLine:true }} }}));
+  }});
+  s.addText(mruns, {{ x:0.35, y:0.72, w:12.6, h:6.1, fontFace:"Arial", valign:"top", lineSpacing:15.5 }});
+  footer(s);
+
+  // C1 —— cohort × stance 表 + pie charts
+  s = pres.addSlide();
   s.background = {{ color:"FFFFFF" }};
   s.addText(`Community read — who actually runs? (${{COMM.n}} comments, evidence-tiered)`, {{
     x:0.35, y:0.18, w:12.6, h:0.45, fontSize:19, bold:true, color:NAVY, fontFace:"Arial" }});
@@ -234,15 +302,45 @@ function communitySlides() {{
     return [{{ text:c.name, options:{{ fontSize:10, bold:!!c.bold }} }}]
       .concat(c.row.map(v=>({{ text:String(v), options:{{ fontSize:10, align:"center", bold:!!c.bold }} }})));
   }});
-  s.addTable([hd].concat(body), {{ x:0.35, y:0.8, w:12.6, colW:[5.1,1.5,1.5,1.5,1.5,1.5],
+  s.addTable([hd].concat(body), {{ x:0.35, y:0.72, w:12.6, colW:[5.1,1.5,1.5,1.5,1.5,1.5],
     border:{{ type:"solid", color:LINEC, pt:0.75 }}, margin:0.06, fontFace:"Arial", color:"222222" }});
-  s.addText([
-    {{ text:"Key takeaways\\n", options:{{ bold:true, fontSize:13, color:NAVY }} }},
-  ].concat(COMM.takeaways.map(t=>({{ text:"•  "+t+"\\n", options:{{ fontSize:11.5, color:"222222", breakLine:true }} }}))), {{
-    x:0.35, y:3.3, w:12.6, h:2.6, fontFace:"Arial", valign:"top", lineSpacing:19 }});
+  s.addText("Evidence tier — all comments", {{ x:0.6, y:2.95, w:5.6, h:0.3, fontSize:11.5, bold:true, color:NAVY, fontFace:"Arial", align:"center" }});
+  s.addChart(pres.ChartType.pie,
+    [{{ name:"Evidence tier", labels:COMM.pie_tier.labels, values:COMM.pie_tier.values }}],
+    {{ x:0.6, y:3.25, w:5.6, h:3.1, showLegend:true, legendPos:"b", legendFontSize:9,
+       showPercent:true, dataLabelFontSize:10, dataLabelColor:"FFFFFF",
+       chartColors:["1E2761","B3261E","8A8A8A"] }});
+  s.addText("Confirmed runners — stance on 2-day", {{ x:7.0, y:2.95, w:5.6, h:0.3, fontSize:11.5, bold:true, color:NAVY, fontFace:"Arial", align:"center" }});
+  s.addChart(pres.ChartType.pie,
+    [{{ name:"Runner stance", labels:COMM.pie_runner_stance.labels, values:COMM.pie_runner_stance.values }}],
+    {{ x:7.0, y:3.25, w:5.6, h:3.1, showLegend:true, legendPos:"b", legendFontSize:9,
+       showPercent:true, dataLabelFontSize:10, dataLabelColor:"FFFFFF",
+       chartColors:["2E6E4E","B3261E","D98E04","8A8A8A","CADCFC"] }});
+  s.addText(COMM.takeaways.map(t=>({{ text:"•  "+t+"\\n", options:{{ fontSize:9, color:"222222", breakLine:true }} }})),
+    {{ x:0.35, y:6.28, w:12.6, h:0.62, fontFace:"Arial", valign:"top", lineSpacing:11.5 }});
   footer(s);
 
-  // C2 —— 真跑手論點矩陣
+  // C1b —— 371 條留言嘅源帖（全部連結）
+  s = pres.addSlide();
+  s.background = {{ color:"FFFFFF" }};
+  s.addText(`Comment sources — all ${{COMM.n}} comments come from these posts`, {{
+    x:0.35, y:0.18, w:12.6, h:0.45, fontSize:19, bold:true, color:NAVY, fontFace:"Arial" }});
+  const sh = ["Ref","Date","Platform","Post","No. of comments","Link"].map(h=>({{ text:h, options:{{ bold:true, color:"FFFFFF", fill:{{color:NAVY}}, fontSize:9.5 }} }}));
+  const srows = (COMM.sources||[]).map(p=>[
+    {{ text:p.ref, options:{{ fontSize:9, bold:true, valign:"top" }} }},
+    {{ text:p.date||"TBC", options:{{ fontSize:9, valign:"top" }} }},
+    {{ text:p.platform, options:{{ fontSize:9, valign:"top" }} }},
+    {{ text:p.title, options:{{ fontSize:9, valign:"top" }} }},
+    {{ text:String(p.n_comments), options:{{ fontSize:9, valign:"top", align:"center" }} }},
+    {{ text:p.url, options:{{ fontSize:7.6, valign:"top", color:"1155CC", hyperlink:{{ url:p.url }} }} }},
+  ]);
+  s.addTable([sh].concat(srows), {{ x:0.35, y:0.72, w:12.6, colW:[0.6,1.0,1.1,3.4,1.3,5.2],
+    border:{{ type:"solid", color:LINEC, pt:0.75 }}, margin:0.04, fontFace:"Arial", color:"222222" }});
+  s.addText("S1–S10 refs are used on the argument-matrix and verbatim pages to trace every point back to its source post.", {{
+    x:0.35, y:6.6, w:12.6, h:0.3, fontSize:9, italic:true, color:"5A5A5A", fontFace:"Arial" }});
+  footer(s);
+
+  // C2 —— 真跑手論點矩陣（附源帖 ref）
   s = pres.addSlide();
   s.background = {{ color:"FFFFFF" }};
   s.addText("Confirmed-runner argument matrix", {{
@@ -250,28 +348,38 @@ function communitySlides() {{
   const nrows = Math.max(COMM.args_support.length, COMM.args_oppose.length);
   const mtr = [[
     {{ text:"Why runners SUPPORT 2-day", options:{{ bold:true, color:"FFFFFF", fill:{{color:GREEN}}, fontSize:11 }} }},
+    {{ text:"Sources", options:{{ bold:true, color:"FFFFFF", fill:{{color:GREEN}}, fontSize:11 }} }},
     {{ text:"Why runners OPPOSE 2-day", options:{{ bold:true, color:"FFFFFF", fill:{{color:RED}}, fontSize:11 }} }},
+    {{ text:"Sources", options:{{ bold:true, color:"FFFFFF", fill:{{color:RED}}, fontSize:11 }} }},
   ]];
-  for (let i=0;i<nrows;i++) mtr.push([
-    {{ text:COMM.args_support[i]||"", options:{{ fontSize:10.5 }} }},
-    {{ text:COMM.args_oppose[i]||"", options:{{ fontSize:10.5 }} }},
-  ]);
-  s.addTable(mtr, {{ x:0.35, y:0.8, w:12.6, colW:[6.3,6.3],
+  for (let i=0;i<nrows;i++) {{
+    const a=COMM.args_support[i]||{{}}, b=COMM.args_oppose[i]||{{}};
+    mtr.push([
+      {{ text:a.t||"", options:{{ fontSize:10.5 }} }},
+      {{ text:a.refs||"", options:{{ fontSize:8.5, color:"5A5A5A" }} }},
+      {{ text:b.t||"", options:{{ fontSize:10.5 }} }},
+      {{ text:b.refs||"", options:{{ fontSize:8.5, color:"5A5A5A" }} }},
+    ]);
+  }}
+  s.addTable(mtr, {{ x:0.35, y:0.8, w:12.6, colW:[4.5,1.8,4.5,1.8],
     border:{{ type:"solid", color:LINEC, pt:0.75 }}, margin:0.06, fontFace:"Arial", color:"222222" }});
+  s.addText("S# = source post — see the Comment sources page for full links.", {{
+    x:0.35, y:6.6, w:12.6, h:0.3, fontSize:9, italic:true, color:"5A5A5A", fontFace:"Arial" }});
   footer(s);
 
-  // C3 —— 代表引言（真跑手原文）
+  // C3 —— 代表引言（真跑手原文，附源帖 ref）
   s = pres.addSlide();
   s.background = {{ color:"FFFFFF" }};
   s.addText("Verbatim highlights — confirmed runners only", {{
     x:0.35, y:0.18, w:12.6, h:0.45, fontSize:19, bold:true, color:NAVY, fontFace:"Arial" }});
-  const qh = ["Stance","Tier","Quote"].map(h=>({{ text:h, options:{{ bold:true, color:"FFFFFF", fill:{{color:NAVY}}, fontSize:9.5 }} }}));
+  const qh = ["Stance","Tier","Src","Quote"].map(h=>({{ text:h, options:{{ bold:true, color:"FFFFFF", fill:{{color:NAVY}}, fontSize:9.5 }} }}));
   const qr = COMM.quotes.concat(COMM.r1_quotes).map(q=>[
     {{ text:q.stance, options:{{ fontSize:8.6, valign:"top" }} }},
     {{ text:q.tier, options:{{ fontSize:8.6, valign:"top", align:"center", bold:q.tier==="R1" }} }},
+    {{ text:q.src||"", options:{{ fontSize:8.6, valign:"top", align:"center" }} }},
     {{ text:q.text, options:{{ fontSize:8.4, valign:"top" }} }},
   ]);
-  s.addTable([qh].concat(qr), {{ x:0.35, y:0.72, w:12.6, colW:[1.5,0.8,10.3],
+  s.addTable([qh].concat(qr), {{ x:0.35, y:0.72, w:12.6, colW:[1.4,0.7,0.7,9.8],
     border:{{ type:"solid", color:LINEC, pt:0.75 }}, margin:0.04, fontFace:"Arial", color:"222222" }});
   footer(s);
 }}
@@ -344,6 +452,7 @@ def main():
         groups[g].append(
             {
                 "topic": (it.get("text") or "")[:180].replace("\n", " ") or "(no text)",
+                "date": it.get("date") or "",
                 "platform": PLATFORM_LABEL.get(it.get("platform"), it.get("platform") or "?"),
                 "comments": it.get("comments_pulled") or it.get("replies") or 0,
                 "link": it.get("url"),

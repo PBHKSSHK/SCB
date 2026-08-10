@@ -35,12 +35,15 @@ python3 monitoring/apply_deck.py --no-analysis
 ## Community-read 分析頁
 
 如果 `monitoring/data/twoday_community_read.json`（comment-level 分類 labels）存在，
-deck 會自動喺 title 之後加 3 頁分析：
+deck 會自動喺 title 之後加 5 頁分析：
 
-1. **Cohort × stance 表** —— 全體 / 確認跑手（R1+R2）/ 唔跑抽水（S）/ 判唔到（U）各自嘅立場分佈 + key takeaways
-2. **真跑手論點矩陣** —— support vs oppose 論點並排（連出現次數）
-3. **代表引言** —— 真跑手原文（R2 按 likes 揀，R1 實錘全列）
+1. **Classification methodology** —— R1/R2/S/U 分級準則、perspective test、audit pass
+2. **Cohort × stance 表 + 兩個 pie chart** —— 證據分級 pie + 真跑手立場 pie + key takeaways
+3. **Comment sources** —— 371 條留言嘅 10 個源帖（S1–S10 ref、日期、連結、留言數）
+4. **真跑手論點矩陣** —— support vs oppose 論點並排（連出現次數 + S# 源帖 ref）
+5. **代表引言** —— 真跑手原文（R2 按 likes 揀，R1 實錘全列，附 S# ref）
 
+Annex 表同時有 **Date 欄**（source 帖日期，嚟自 master.json）。
 Aggregates 喺生成時由 labels 即場計，唔係硬寫死 —— labels 更新，deck 重出即跟。
 
 ## 輸出格式
