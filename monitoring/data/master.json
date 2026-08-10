@@ -11870,6 +11870,78 @@
    "comments_pulled": 27,
    "replies": 27,
    "human_notes": "用戶指出 crawler 漏咗 FB（獨媒FB對應帖/跑步關注組group帖）；Apify 抽取"
+  },
+  "https://www.facebook.com/groups/1852485348459116/posts/2649034162137560/": {
+   "url": "https://www.facebook.com/groups/1852485348459116/posts/2649034162137560/",
+   "platform": "facebook",
+   "date": "2026-01",
+   "first_seen": "2026-08-10",
+   "text": "香港跑步關注組 跑友點睇（舊帖）",
+   "issue_labels": [
+    "two-day-format"
+   ],
+   "relevance": "direct",
+   "origin": "human-add",
+   "source_channel": "human-add",
+   "review_status": "approved",
+   "cycle": "2027",
+   "comments_pulled": 96,
+   "replies": 96,
+   "human_notes": "用戶 Meta 內部 search 發現 crawler 漏網；Apify/TikHub 抽取"
+  },
+  "https://www.facebook.com/share/p/19HaLdQ3pd/": {
+   "url": "https://www.facebook.com/share/p/19HaLdQ3pd/",
+   "platform": "facebook",
+   "date": "2026-02",
+   "first_seen": "2026-08-10",
+   "text": "獨媒 議員倡分兩日 一日專業一日與眾同樂",
+   "issue_labels": [
+    "two-day-format"
+   ],
+   "relevance": "direct",
+   "origin": "human-add",
+   "source_channel": "human-add",
+   "review_status": "approved",
+   "cycle": "2027",
+   "comments_pulled": 142,
+   "replies": 142,
+   "human_notes": "用戶 Meta 內部 search 發現 crawler 漏網；Apify/TikHub 抽取"
+  },
+  "https://www.facebook.com/photo/?fbid=1392561962908593": {
+   "url": "https://www.facebook.com/photo/?fbid=1392561962908593",
+   "platform": "facebook",
+   "date": "2026-04",
+   "first_seen": "2026-08-10",
+   "text": "HKDiscuss FB 渣馬考慮分兩日跑",
+   "issue_labels": [
+    "two-day-format"
+   ],
+   "relevance": "direct",
+   "origin": "human-add",
+   "source_channel": "human-add",
+   "review_status": "approved",
+   "cycle": "2027",
+   "comments_pulled": 14,
+   "replies": 14,
+   "human_notes": "用戶 Meta 內部 search 發現 crawler 漏網；Apify/TikHub 抽取"
+  },
+  "https://www.instagram.com/p/DTmrP6nk8hy/": {
+   "url": "https://www.instagram.com/p/DTmrP6nk8hy/",
+   "platform": "instagram",
+   "date": "2026-01-17",
+   "first_seen": "2026-08-10",
+   "text": "Fitz IG 新加坡渣馬模式",
+   "issue_labels": [
+    "two-day-format"
+   ],
+   "relevance": "direct",
+   "origin": "human-add",
+   "source_channel": "human-add",
+   "review_status": "approved",
+   "cycle": "2027",
+   "comments_pulled": 7,
+   "replies": 7,
+   "human_notes": "用戶 Meta 內部 search 發現 crawler 漏網；Apify/TikHub 抽取"
   }
  },
  "runs": [

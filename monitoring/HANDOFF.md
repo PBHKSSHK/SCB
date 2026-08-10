@@ -26,7 +26,17 @@ Repo 唯一 branch：`claude/hong-kong-marathon-one-two-day-ejweky`。
 - [ ] 用戶提供咗一份 **FB 跑步 groups Excel**（26 groups × ~140 帳號 R/V 矩陣）——**未入庫**，同 monitoring DB 係兩件事
 - [ ] Deck 出街前：人手開 pptx 覆核 + 抽查 3-5 條連結
 - [ ] 用戶想試 **FB 關鍵詞直搜**（Apify，唔靠 Google site:）掃漏網 FB 帖/group——未跑，等確認
-- [ ] 源帖**網頁截圖**：本機瀏覽器出網被封；用戶考慮加 Bright Data MCP（見對話）
+- [ ] **人手先攞到**嘅留言：渣打馬拉松2015-2099 closed group 兩帖（~49條）＋香討 thread（42條，403反爬）——要組員/人手 copy，然後 add_link 入庫
+- [ ] IG 源帖截圖 3 張（S3/S4/S16）——Bright Data 影 IG 空白，人手截
+
+## 2026-08-10 更新（二）：Meta 內部 search 對數 + S13–S16
+
+用戶用 Meta 內部 search 畀咗 19 帖對數（`1D_vs_2D_discussion.xlsx`）：12 帖已有（S1–S12），
+7 帖漏網。已抽 4 帖：S13 跑步關注組舊帖（96）、S14 獨媒議員倡FB（142，第二大source）、
+S15 HKDiscuss FB（14）、S16 Fitz IG（7，TikHub）。分類+audit 後總量 **765 條、真跑手 142**。
+**跑手立場變咗：37 支持 vs 38 反對（五五波）**——S14 帶入跑手反對聲（星期六返工/分法唔可行/
+義工通宵/凌晨起步）。反對聲 83% 仍係非跑手。
+源帖截圖 13/16 張已存 `out/screencaps/`（Bright Data unlocker zone `mcp_unlocker`）。
 
 ## 2026-08-10 更新：FB 補漏
 
